@@ -3,7 +3,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ArchetypeCatalog = require(ReplicatedStorage.Definitions.Characters.ArchetypeCatalog)
-local BuildResolver = require(script.Parent.Parent.Items.BuildResolver)
 local CharacterNameRules = require(ReplicatedStorage.Shared.Utility.CharacterNameRules)
 local ClockService = require(script.Parent.Parent.Parent.Platform.Scheduling.ClockService)
 local CombatStateService = require(script.Parent.Parent.Combat.CombatStateService)
@@ -13,14 +12,11 @@ local DataService = require(script.Parent.Parent.Parent.Platform.Persistence.Dat
 local DeathService = require(script.Parent.Parent.Combat.DeathService)
 local EnterZoneResolver = require(ReplicatedStorage.Shared.World.EnterZoneResolver)
 local EquipmentService = require(script.Parent.Parent.Items.EquipmentService)
-local ExtraPoolCatalog = require(ReplicatedStorage.Definitions.Combat.Stats.ExtraPoolCatalog)
 local GameConstants = require(ReplicatedStorage.Shared.Constants.GameConstants)
 local Id = require(ReplicatedStorage.Shared.Utility.Id)
 local IdentityGrantResolver = require(script.Parent.IdentityGrantResolver)
 local InventoryService = require(script.Parent.Parent.Items.InventoryService)
 local ItemCatalog = require(ReplicatedStorage.Definitions.Items.ItemCatalog)
-local MacroCatalog = require(ReplicatedStorage.Definitions.Combat.Macros.MacroCatalog)
-local MasteryService = require(script.Parent.Parent.Progression.MasteryService)
 local MovementResolver = require(script.Parent.MovementResolver)
 local OriginCatalog = require(ReplicatedStorage.Definitions.Characters.OriginCatalog)
 local ProfessionCatalog = require(ReplicatedStorage.Definitions.Items.ProfessionCatalog)
@@ -32,13 +28,11 @@ local Result = require(ReplicatedStorage.Shared.Utility.Result)
 local RewardResolver = require(script.Parent.Parent.Progression.RewardResolver)
 local SpecializationCatalog = require(ReplicatedStorage.Definitions.Characters.SpecializationCatalog)
 local StartingLoadoutCatalog = require(ReplicatedStorage.Definitions.Characters.StartingLoadoutCatalog)
-local StartingMacroCatalog = require(ReplicatedStorage.Definitions.Characters.StartingMacroCatalog)
 local StatService = require(script.Parent.Parent.Stats.StatService)
 local TalentService = require(script.Parent.Parent.Progression.TalentService)
 local UnitRegistry = require(script.Parent.Parent.Combat.UnitRegistry)
 local VitalsService = require(script.Parent.Parent.Combat.VitalsService)
 local VitalsSnapshot = require(script.Parent.Parent.Combat.VitalsSnapshot)
-local WorldEventService = require(script.Parent.Parent.LiveOps.WorldEventService)
 local WorldService = require(script.Parent.Parent.World.WorldService)
 local WornBags = require(ReplicatedStorage.Shared.Utility.WornBags)
 local ZoneCatalog = require(ReplicatedStorage.Definitions.World.ZoneCatalog)
@@ -61,15 +55,12 @@ type RosterRow = {
 	RestXP: number,
 	Deaths: number,
 	TalentPoints: number,
-	MasteryPoints: number,
-	EndgameScore: number,
 	Astral: number,
 	Honor: number,
 	Conquest: number,
 	GuildName: string,
 	GuildRank: string,
 	GearItemLevel: number,
-	GearCombatPower: number,
 	PvpWins: number,
 	PvpLosses: number,
 	Mmr: number,
@@ -83,25 +74,6 @@ type RosterRow = {
 	Latticecraft: number,
 	AchievementCount: number,
 }
-
-local function profileExtraPool(profile: PlayerProfile, statId: string): number
-	if statId == "Focus" then
-		return profile.Vitals.Focus
-	elseif statId == "Momentum" then
-		return profile.Vitals.Momentum
-	elseif statId == "Guard" then
-		return profile.Vitals.Guard
-	elseif statId == "Charge" then
-		return profile.Vitals.Charge
-	elseif statId == "Overdrive" then
-		return profile.Vitals.Overdrive
-	elseif statId == "AstralPower" then
-		return profile.Vitals.AstralPower
-	elseif statId == "StaminaResource" then
-		return profile.Vitals.StaminaResource
-	end
-	return 0
-end
 
 type CharacterServiceApi = {
 	Name: string,
@@ -149,14 +121,12 @@ local CharacterService = {
 local _stats: typeof(StatService)
 local _data: typeof(DataService)
 local _talents: typeof(TalentService)
-local _masteries: typeof(MasteryService)
 local _equipment: typeof(EquipmentService)
 local _resources: typeof(VitalsService)
 local _status: typeof(CombatStateService)
 local _death: typeof(DeathService)
 local _inv: typeof(InventoryService)
 local _world: typeof(WorldService)
-local _events: typeof(WorldEventService)
 local _cooldowns: typeof(CooldownService)
 
 -- Jumps stay below this drop; stock FallResistance=1 then deals no new damage vs pre-S2.
@@ -283,7 +253,12 @@ local function rowFromProfile(profile: PlayerProfile, rowId: string): RosterRow?
 	if string.len(rowId) == 0 then
 		return nil
 	end
-	local build = BuildResolver.fromProfile(profile, WornBags.flat(profile))
+	local worn = WornBags.flat(profile)
+	local itemLevelTotal = 0
+	for _, item in worn do
+		itemLevelTotal += item.ItemLevel
+	end
+	local gearItemLevel = if #worn > 0 then itemLevelTotal / #worn else 0
 	local questCount = 0
 	for _, quest in profile.Quests do
 		if quest.State == "Active" or quest.State == "Ready" or quest.State == "Complete" then
@@ -305,15 +280,12 @@ local function rowFromProfile(profile: PlayerProfile, rowId: string): RosterRow?
 		RestXP = profile.Progression.RestXP,
 		Deaths = profile.Progression.Deaths,
 		TalentPoints = profile.Progression.TalentPoints,
-		MasteryPoints = profile.Progression.MasteryPoints,
-		EndgameScore = profile.Progression.EndgameScore,
 		Astral = profile.Currency.Astral or 0,
 		Honor = profile.Currency.Honor or 0,
 		Conquest = profile.Currency.Conquest or 0,
 		GuildName = profile.Guild.Name,
 		GuildRank = profile.Guild.Rank,
-		GearItemLevel = build.GearItemLevel,
-		GearCombatPower = build.GearCombatPower,
+		GearItemLevel = gearItemLevel,
 		PvpWins = profile.PvP.Wins,
 		PvpLosses = profile.PvP.Losses,
 		Mmr = profile.PvP.MMR,
@@ -349,14 +321,13 @@ local function flushVitals(player: Player, profile: PlayerProfile)
 		profile.Vitals,
 		VitalsSnapshot.fromService(
 			_resources:Get(player, "Health"),
-			_resources:Get(player, "Energy"),
+			_resources:Get(player, "Mana"),
+			_resources:Get(player, "Rage"),
 			_resources:Get(player, "Focus"),
-			_resources:Get(player, "Momentum"),
-			_resources:Get(player, "Guard"),
-			_resources:Get(player, "Charge"),
-			_resources:Get(player, "Overdrive"),
-			_resources:Get(player, "AstralPower"),
-			_resources:Get(player, "StaminaResource")
+			_resources:Get(player, "Energy"),
+			_resources:Get(player, "Happiness"),
+			_resources:Get(player, "Rune"),
+			_resources:Get(player, "RunicPower")
 		),
 		true
 	)
@@ -375,14 +346,12 @@ function CharacterService:Init(container: ContainerTypes.Container)
 	_stats = container:Get(StatService.Name) :: typeof(StatService)
 	_data = container:Get(DataService.Name) :: typeof(DataService)
 	_talents = container:Get(TalentService.Name) :: typeof(TalentService)
-	_masteries = container:Get(MasteryService.Name) :: typeof(MasteryService)
 	_equipment = container:Get(EquipmentService.Name) :: typeof(EquipmentService)
 	_resources = container:Get(VitalsService.Name) :: typeof(VitalsService)
 	_status = container:Get(CombatStateService.Name) :: typeof(CombatStateService)
 	_death = container:Get(DeathService.Name) :: typeof(DeathService)
 	_inv = container:Get(InventoryService.Name) :: typeof(InventoryService)
 	_world = container:Get(WorldService.Name) :: typeof(WorldService)
-	_events = container:Get(WorldEventService.Name) :: typeof(WorldEventService)
 	_cooldowns = container:Get(CooldownService.Name) :: typeof(CooldownService)
 end
 
@@ -405,7 +374,7 @@ function CharacterService:Start()
 			return
 		end
 		if auraId == "FoodBuff" then
-			_stats:ClearSource(player, "Potion")
+			_stats:ClearSource(player, "Consumable")
 			CharacterService:RebuildStats(player)
 			return
 		end
@@ -494,19 +463,8 @@ function CharacterService:RebuildStats(player: Player)
 	if originDef then
 		_stats:AddModifier(player, OriginCatalog.modifierFor(originDef))
 	end
-	local spec = SpecializationCatalog.get(profile.Character.SpecializationId)
-	if spec then
-		_stats:AddModifier(player, {
-			StatId = spec.StatId,
-			Source = "Archetype",
-			SourceId = spec.Id,
-			Op = "Add",
-			Value = spec.StatValue,
-			Priority = 12,
-		})
-	end
 	local arch = ArchetypeCatalog.get(profile.Character.ArchetypeId)
-	local biasId = ""
+	local powerType = "Energy"
 	if arch then
 		for index, statId in arch.PrimaryStats do
 			local bonus = PRIMARY_STAT_BONUS[index]
@@ -522,14 +480,10 @@ function CharacterService:RebuildStats(player: Player)
 				Priority = 11,
 			})
 		end
-		if arch.ResourceBias ~= nil then
-			biasId = arch.ResourceBias
-		end
+		powerType = arch.PowerType
 	end
 	_talents:Rebuild(player)
-	_masteries:Rebuild(player)
 	_equipment:Rebuild(player)
-	_events:Apply(player)
 	_stats:ClearSource(player, "Profession")
 	for _, modifier in ProfessionCatalog.modifiersFor(profile.Progression.ProfessionSkills) do
 		_stats:AddModifier(player, modifier)
@@ -561,18 +515,18 @@ function CharacterService:RebuildStats(player: Player)
 	end
 	_resources:Set(player, "Health", hp)
 	_resources:Set(player, "Energy", energy)
-	for _, statId in ExtraPoolCatalog.statIds() do
-		local maxVal = _resources:GetMax(player, statId)
-		local stored = profileExtraPool(profile, statId)
-		local current = math.clamp(stored, 0, maxVal)
-		if maxVal > 0 and stored == 0 then
-			local isBuilder = statId == "Momentum" or statId == "Guard" or statId == "Charge"
-			if not isBuilder or statId == biasId then
-				current = maxVal
-			end
-		end
-		_resources:Set(player, statId, current)
+	if existing == nil then
+		_resources:Set(player, "Mana", profile.Vitals.Mana)
+		_resources:Set(player, "Rage", profile.Vitals.Rage)
+		_resources:Set(player, "Focus", profile.Vitals.Focus)
+		_resources:Set(player, "Energy", profile.Vitals.Energy)
+		_resources:Set(player, "Happiness", profile.Vitals.Happiness)
+		_resources:Set(player, "Rune", profile.Vitals.Rune)
+		_resources:Set(player, "RunicPower", profile.Vitals.RunicPower)
 	end
+	-- Keep the active archetype power full only for freshly created characters.
+	-- Builder powers (Rage/RunicPower) deliberately remain at their persisted value.
+	local _activePower = powerType
 	UnitRegistry.register({
 		Id = unitId,
 		Kind = "Player",
@@ -749,7 +703,6 @@ function CharacterService:Create(
 	local racialAbilityId = if raceDef then raceDef.RacialAbilityId else ""
 	local originQuestId = `Quest_Origin_{resolvedOriginId}`
 	local archQuestId = `Quest_Arch_{archetypeId}`
-	local seed = StartingMacroCatalog.get(archetypeId)
 	_data:Mutate(player, function(profile)
 		local nextId = if profile.Character.Id == "" then Id.guid() else profile.Character.Id
 		profile.Character =
@@ -758,31 +711,12 @@ function CharacterService:Create(
 		profile.Abilities = IdentityGrantResolver.collectAbilities(
 			arch.Abilities,
 			arch.SignatureAbilityId,
-			spec.ExtraAbilities,
+			{},
 			racialAbilityId
 		)
-		profile.ActionBars =
-			IdentityGrantResolver.buildDefaultActionBar(arch.Abilities, spec.ExtraAbilities, racialAbilityId)
+		profile.ActionBars = IdentityGrantResolver.buildDefaultActionBar(arch.Abilities, {}, racialAbilityId)
 		if (profile.Currency.Astral or 0) < 50 then
 			profile.Currency.Astral = 50
-		end
-		if seed ~= nil then
-			local entry = MacroCatalog.get(seed.MacroId)
-			if entry ~= nil then
-				local haveSeed = false
-				for _, save in profile.Macros do
-					if save.Id == entry.Id then
-						haveSeed = true
-						break
-					end
-				end
-				if not haveSeed then
-					table.insert(
-						profile.Macros,
-						{ Id = entry.Id, Source = entry.Source, BarProfile = entry.BarProfile }
-					)
-				end
-			end
 		end
 		if QuestCatalog.get(originQuestId) ~= nil then
 			local haveOrigin = false
@@ -829,11 +763,10 @@ function CharacterService:Create(
 	end
 	CharacterService:RebuildStats(player)
 	_status:Set(player, "Normal")
-	if arch.ResourceBias ~= nil and arch.ResourceBias ~= "" then
-		local maxVal = _resources:GetMax(player, arch.ResourceBias)
-		if maxVal > 0 then
-			_resources:Set(player, arch.ResourceBias, maxVal)
-		end
+	local powerType = arch.PowerType
+	local maxVal = _resources:GetMax(player, powerType)
+	if maxVal > 0 and powerType ~= "Rage" and powerType ~= "RunicPower" then
+		_resources:Set(player, powerType, maxVal)
 	end
 	-- Already in lobby via requireLobby; re-park after RebuildStats without duplicate SetParked churn.
 	if player.Character then
@@ -1203,7 +1136,7 @@ function CharacterService:ApplyFood(player: Player, statId: string, value: numbe
 	end
 	_stats:AddModifier(player, {
 		StatId = statId,
-		Source = "Potion",
+		Source = "Consumable",
 		SourceId = "food",
 		Op = "Add",
 		Value = value,
