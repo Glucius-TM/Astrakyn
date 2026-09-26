@@ -39,10 +39,106 @@ local function migrate2To3(profile: JsonObject): JsonObject
 	return profile
 end
 
+
+local function numberOr(value: unknown, fallback: number): number
+	return if typeof(value) == "number" then value else fallback
+end
+
+local function migrateVitals(owner: JsonObject)
+	local raw = owner.Vitals
+	local old: JsonObject = if typeof(raw) == "table" then raw :: JsonObject else {}
+	owner.Vitals = {
+		Health = numberOr(old.Health, 0),
+		Mana = math.max(numberOr(old.Mana, 0), numberOr(old.AstralPower, 0)),
+		Rage = math.max(numberOr(old.Rage, 0), numberOr(old.Guard, 0), numberOr(old.Charge, 0)),
+		Focus = numberOr(old.Focus, 0),
+		Energy = math.max(
+			numberOr(old.Energy, 0),
+			numberOr(old.Momentum, 0),
+			numberOr(old.StaminaResource, 0)
+		),
+		Happiness = numberOr(old.Happiness, 100),
+		Rune = numberOr(old.Rune, 6),
+		RunicPower = math.max(numberOr(old.RunicPower, 0), numberOr(old.Overdrive, 0)),
+	}
+end
+
+local function stripMacroBindings(owner: JsonObject)
+	local bars = owner.ActionBars
+	if typeof(bars) ~= "table" then
+		return
+	end
+	local kept: JsonArray = {}
+	for _, value in bars :: JsonArray do
+		if typeof(value) == "table" then
+			local row = value :: JsonObject
+			if row.Kind ~= "Macro" then
+				table.insert(kept, row)
+			end
+		end
+	end
+	owner.ActionBars = kept
+end
+
+local function stripLegacyCharacterSystems(owner: JsonObject)
+	local progression = owner.Progression
+	if typeof(progression) == "table" then
+		local p = progression :: JsonObject
+		p.MasteryPoints = nil
+		p.EndgameScore = nil
+	end
+	owner.Stats = nil
+	owner.Masteries = nil
+	owner.Macros = nil
+	owner.Settlements = nil
+	local loadouts = owner.Loadouts
+	if typeof(loadouts) == "table" then
+		for _, value in loadouts :: JsonArray do
+			if typeof(value) == "table" then
+				local row = value :: JsonObject
+				row.Masteries = nil
+				local bars = row.ActionBars
+				if typeof(bars) == "table" then
+					local kept: JsonArray = {}
+					for _, barValue in bars :: JsonArray do
+						if typeof(barValue) == "table" then
+							local bar = barValue :: JsonObject
+							if bar.Kind ~= "Macro" then
+								table.insert(kept, bar)
+							end
+						end
+					end
+					row.ActionBars = kept
+				end
+			end
+		end
+	end
+	stripMacroBindings(owner)
+	migrateVitals(owner)
+end
+
+local function migrate3To4(profile: JsonObject): JsonObject
+	-- Schema 4 removes ASTRAKYN-only mastery/macro/settlement/stat-snapshot state and
+	-- maps the legacy resource pools into the fixed Unit power slots used by the
+	-- 3.3.5a-aligned runtime. Presentation/content identity is otherwise preserved.
+	stripLegacyCharacterSystems(profile)
+	local roster = profile.Roster
+	if typeof(roster) == "table" then
+		for _, value in roster :: JsonArray do
+			if typeof(value) == "table" then
+				stripLegacyCharacterSystems(value :: JsonObject)
+			end
+		end
+	end
+	profile.SchemaVersion = 4
+	return profile
+end
+
 -- Migration steps are keyed by their source schema and must advance exactly N -> N+1.
 local STEPS: { [number]: (JsonObject) -> JsonObject } = {
 	[1] = migrate1To2,
 	[2] = migrate2To3,
+	[3] = migrate3To4,
 }
 
 local MigrationRegistry = {}
