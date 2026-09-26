@@ -9,24 +9,14 @@ local StartingAbilityCatalog = require(ReplicatedStorage.Definitions.Characters.
 
 type PlayerProfile = ProfileTypes.PlayerProfile
 type ItemSave = ProfileTypes.ItemSave
-type MacroSave = ProfileTypes.MacroSave
 type ActionBarSave = ProfileTypes.ActionBarSave
 type QuestSave = ProfileTypes.QuestSave
 type MailSave = ProfileTypes.MailSave
 type AuctionSave = ProfileTypes.AuctionSave
 type LoadoutSave = ProfileTypes.LoadoutSave
-type SettlementSave = ProfileTypes.SettlementSave
 type CharacterSave = ProfileTypes.CharacterSave
-
-type CharacterAppearance = {
-	Created: boolean,
-	ArchetypeId: string,
-	SpecializationId: string,
-	RaceId: string,
-	OriginId: string,
-	Name: string,
-	TransformationId: string,
-}
+type VitalsSave = ProfileTypes.VitalsSave
+type CharacterAppearance = ProfileTypes.CharacterIdentitySave
 
 local ProfileFactory = {}
 
@@ -82,18 +72,6 @@ local function copyBank(src: ProfileTypes.BankState): ProfileTypes.BankState
 		Items = copyItems(src.Items),
 		Equipment = copyStringMap(src.Equipment),
 	}
-end
-
-local function copyMacros(src: { MacroSave }): { MacroSave }
-	local out: { MacroSave } = {}
-	for _, row in src do
-		table.insert(out, {
-			Id = row.Id,
-			Source = row.Source,
-			BarProfile = row.BarProfile,
-		})
-	end
-	return out
 end
 
 local function copyBars(src: { ActionBarSave }): { ActionBarSave }
@@ -179,28 +157,23 @@ local function copyLoadouts(src: { LoadoutSave }): { LoadoutSave }
 			Name = row.Name,
 			Equipment = copyStringMap(row.Equipment),
 			Talents = copyStringList(row.Talents),
-			Masteries = copyNumberMap(row.Masteries),
 			ActionBars = copyBars(row.ActionBars),
 		})
 	end
 	return out
 end
 
-local function copySettlements(src: { SettlementSave }): { SettlementSave }
-	local out: { SettlementSave } = {}
-	for _, row in src do
-		table.insert(out, {
-			Id = row.Id,
-			ZoneId = row.ZoneId,
-			ClaimedAt = row.ClaimedAt,
-			OwnerUserId = row.OwnerUserId,
-			OwnershipScore = row.OwnershipScore,
-			StructureCount = row.StructureCount,
-			ScoredAt = row.ScoredAt,
-			GuildId = row.GuildId,
-		})
-	end
-	return out
+local function copyVitals(src: VitalsSave): VitalsSave
+	return {
+		Health = src.Health,
+		Mana = src.Mana,
+		Rage = src.Rage,
+		Focus = src.Focus,
+		Energy = src.Energy,
+		Happiness = src.Happiness,
+		Rune = src.Rune,
+		RunicPower = src.RunicPower,
+	}
 end
 
 local function appearanceFrom(
@@ -239,8 +212,6 @@ local function characterSave(id: string, profile: PlayerProfile): CharacterSave
 			Level = profile.Progression.Level,
 			XP = profile.Progression.XP,
 			TalentPoints = profile.Progression.TalentPoints,
-			EndgameScore = profile.Progression.EndgameScore,
-			MasteryPoints = profile.Progression.MasteryPoints,
 			Deaths = profile.Progression.Deaths,
 			PlayedSeconds = profile.Progression.PlayedSeconds,
 			RestXP = profile.Progression.RestXP,
@@ -249,14 +220,11 @@ local function characterSave(id: string, profile: PlayerProfile): CharacterSave
 			ProfessionSkills = copyNumberMap(profile.Progression.ProfessionSkills),
 			Lockouts = copyNumberMap(profile.Progression.Lockouts),
 		},
-		Stats = copyNumberMap(profile.Stats),
 		Equipment = copyStringMap(profile.Equipment),
 		Bags = copyBags(profile.Bags),
 		Bank = copyBank(profile.Bank),
 		Abilities = copyStringList(profile.Abilities),
 		Talents = copyStringList(profile.Talents),
-		Masteries = copyNumberMap(profile.Masteries),
-		Macros = copyMacros(profile.Macros),
 		ActionBars = copyBars(profile.ActionBars),
 		Loadouts = copyLoadouts(profile.Loadouts),
 		ActiveLoadoutId = profile.ActiveLoadoutId,
@@ -280,18 +248,7 @@ local function characterSave(id: string, profile: PlayerProfile): CharacterSave
 		Collections = copyStringList(profile.Collections),
 		Mail = copyMail(profile.Mail),
 		AuctionEscrow = copyAuctions(profile.AuctionEscrow),
-		Vitals = {
-			Health = profile.Vitals.Health,
-			Energy = profile.Vitals.Energy,
-			Focus = profile.Vitals.Focus,
-			Momentum = profile.Vitals.Momentum,
-			Guard = profile.Vitals.Guard,
-			Charge = profile.Vitals.Charge,
-			Overdrive = profile.Vitals.Overdrive,
-			AstralPower = profile.Vitals.AstralPower,
-			StaminaResource = profile.Vitals.StaminaResource,
-		},
-		Settlements = copySettlements(profile.Settlements),
+		Vitals = copyVitals(profile.Vitals),
 		Cosmetics = copyStringList(profile.Cosmetics),
 		PvP = {
 			MMR = profile.PvP.MMR,
@@ -350,8 +307,6 @@ function ProfileFactory.empty(userId: number, displayName: string): PlayerProfil
 			Level = 1,
 			XP = 0,
 			TalentPoints = 1,
-			EndgameScore = 0,
-			MasteryPoints = 0,
 			Deaths = 0,
 			PlayedSeconds = 0,
 			RestXP = 0,
@@ -360,14 +315,11 @@ function ProfileFactory.empty(userId: number, displayName: string): PlayerProfil
 			ProfessionSkills = { Mining = 0, Smithing = 0, Cooking = 0, Alchemy = 0, Latticecraft = 0 },
 			Lockouts = {},
 		},
-		Stats = {},
 		Equipment = EquipmentSlotCatalog.emptyEquipmentMap(),
 		Bags = BagTypes.emptyBagMap(),
 		Bank = BagTypes.emptyBank(),
 		Abilities = StartingAbilityCatalog.defaultAbilities(),
 		Talents = {},
-		Masteries = { Combat = 0, Energy = 0, Defense = 0, Mobility = 0, Transformation = 0, Healing = 0, Crit = 0 },
-		Macros = {},
 		ActionBars = StartingAbilityCatalog.defaultActionBar("PvE"),
 		Loadouts = {},
 		ActiveLoadoutId = "",
@@ -383,16 +335,14 @@ function ProfileFactory.empty(userId: number, displayName: string): PlayerProfil
 		Transactions = {},
 		Vitals = {
 			Health = 0,
+			Mana = 0,
+			Rage = 0,
+			Focus = 0,
 			Energy = 0,
-			Focus = 100,
-			Momentum = 0,
-			Guard = 0,
-			Charge = 0,
-			Overdrive = 0,
-			AstralPower = 0,
-			StaminaResource = 0,
+			Happiness = 100,
+			Rune = 6,
+			RunicPower = 0,
 		},
-		Settlements = {},
 		Social = { Friends = {}, Blocked = {}, MuteUntil = 0 },
 		Settings = { Locale = "es" },
 		Cosmetics = {},
@@ -406,15 +356,7 @@ function ProfileFactory.capture(profile: PlayerProfile): CharacterSave
 end
 
 function ProfileFactory.apply(profile: PlayerProfile, save: CharacterSave)
-	local appearance = appearanceFrom(
-		save.Character.Created,
-		save.Character.ArchetypeId,
-		save.Character.SpecializationId,
-		save.Character.RaceId,
-		save.Character.OriginId,
-		save.Character.Name,
-		save.Character.TransformationId
-	)
+	local appearance = save.Character
 	profile.Character.Id = save.Id
 	profile.Character.Created = appearance.Created
 	profile.Character.ArchetypeId = appearance.ArchetypeId
@@ -427,8 +369,6 @@ function ProfileFactory.apply(profile: PlayerProfile, save: CharacterSave)
 		Level = save.Progression.Level,
 		XP = save.Progression.XP,
 		TalentPoints = save.Progression.TalentPoints,
-		EndgameScore = save.Progression.EndgameScore,
-		MasteryPoints = save.Progression.MasteryPoints,
 		Deaths = save.Progression.Deaths,
 		PlayedSeconds = save.Progression.PlayedSeconds,
 		RestXP = save.Progression.RestXP,
@@ -437,14 +377,11 @@ function ProfileFactory.apply(profile: PlayerProfile, save: CharacterSave)
 		ProfessionSkills = copyNumberMap(save.Progression.ProfessionSkills),
 		Lockouts = copyNumberMap(save.Progression.Lockouts),
 	}
-	profile.Stats = copyNumberMap(save.Stats)
 	profile.Equipment = copyStringMap(save.Equipment)
 	profile.Bags = copyBags(save.Bags)
 	profile.Bank = copyBank(save.Bank)
 	profile.Abilities = copyStringList(save.Abilities)
 	profile.Talents = copyStringList(save.Talents)
-	profile.Masteries = copyNumberMap(save.Masteries)
-	profile.Macros = copyMacros(save.Macros)
 	profile.ActionBars = copyBars(save.ActionBars)
 	profile.Loadouts = copyLoadouts(save.Loadouts)
 	profile.ActiveLoadoutId = save.ActiveLoadoutId
@@ -468,18 +405,7 @@ function ProfileFactory.apply(profile: PlayerProfile, save: CharacterSave)
 	profile.Collections = copyStringList(save.Collections)
 	profile.Mail = copyMail(save.Mail)
 	profile.AuctionEscrow = copyAuctions(save.AuctionEscrow)
-	profile.Vitals = {
-		Health = save.Vitals.Health,
-		Energy = save.Vitals.Energy,
-		Focus = save.Vitals.Focus,
-		Momentum = save.Vitals.Momentum,
-		Guard = save.Vitals.Guard,
-		Charge = save.Vitals.Charge,
-		Overdrive = save.Vitals.Overdrive,
-		AstralPower = save.Vitals.AstralPower,
-		StaminaResource = save.Vitals.StaminaResource,
-	}
-	profile.Settlements = copySettlements(save.Settlements)
+	profile.Vitals = copyVitals(save.Vitals)
 	profile.Cosmetics = copyStringList(save.Cosmetics)
 	profile.PvP = {
 		MMR = save.PvP.MMR,
