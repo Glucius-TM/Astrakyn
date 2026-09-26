@@ -46,7 +46,6 @@ local function makeLoadout(
 	name: string,
 	equipment: { [string]: string },
 	talents: { string },
-	masteries: { [string]: number },
 	actionBars: { ActionBarSave }
 ): LoadoutSave
 	return {
