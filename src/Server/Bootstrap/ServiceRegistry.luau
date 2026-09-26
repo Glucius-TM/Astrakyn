@@ -3,6 +3,7 @@
 local ServerScriptService = game:GetService("ServerScriptService")
 local ServiceContainer = require(ServerScriptService.Bootstrap.ServiceContainer)
 
+local ActionBarService = require(ServerScriptService.Domains.Character.ActionBarService)
 local AnalyticsService = require(ServerScriptService.Platform.Analytics.AnalyticsService)
 local AuctionIndexService = require(ServerScriptService.Domains.Economy.AuctionIndexService)
 local AuctionService = require(ServerScriptService.Domains.Economy.AuctionService)
@@ -57,6 +58,7 @@ local WorldEventService = require(ServerScriptService.Domains.LiveOps.WorldEvent
 local WorldService = require(ServerScriptService.Domains.World.WorldService)
 
 export type App = {
+	ActionBarService: typeof(ActionBarService),
 	RuntimeConfigService: typeof(RuntimeConfigService),
 	ClockService: typeof(ClockService),
 	TickService: typeof(TickService),
@@ -114,6 +116,7 @@ export type App = {
 local ServiceRegistry = {}
 
 function ServiceRegistry.registerAll(): (typeof(ServiceContainer), App)
+	ServiceContainer:Register(ActionBarService.Name, ActionBarService)
 	ServiceContainer:Register(RuntimeConfigService.Name, RuntimeConfigService)
 	ServiceContainer:Register(ClockService.Name, ClockService)
 	ServiceContainer:Register(TickService.Name, TickService)
@@ -174,6 +177,7 @@ function ServiceRegistry.registerAll(): (typeof(ServiceContainer), App)
 	end)
 
 	local app: App = {
+		ActionBarService = ActionBarService,
 		RuntimeConfigService = RuntimeConfigService,
 		ClockService = ClockService,
 		TickService = TickService,
