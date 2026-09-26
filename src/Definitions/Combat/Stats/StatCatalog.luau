@@ -81,7 +81,7 @@ local catalog: { StatDefinition } = {
 	def("ArmorPenetration", "Armor Penetration", "Derived", "Percent", 0, "Offense", 3, true),
 
 	-- Unit modifiers / combat fields with direct 3.3.5a equivalents.
-	def("Armor", "Armor", "UnitMod", "Number", 0, "Defense", 0, false),
+	def("Armor", "Armor", "UnitMod", "Number", 0, "Defense", 0, false),\n\tdef("WeaponDamage", "Weapon Damage", "UnitMod", "Number", 0, "Offense", 2, false),
 	def("DamageReduction", "Damage Reduction", "UnitMod", "Percent", 0, "Defense", 3, true),
 	def("ThreatMultiplier", "Threat Multiplier", "UnitMod", "Percent", 1, "Utility", 3, false),
 	def("HealingDone", "Healing Done", "UnitMod", "Percent", 1, "Healing", 3, false),
