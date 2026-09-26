@@ -1,19 +1,14 @@
 --!strict
 
--- Copies live VitalsService pools onto PlayerProfile.Vitals.
--- Bootstrap owns leave order: AddRest → DataService:Release (this apply) → VitalsService:Clear.
--- DataService's deferred leave fallback is idempotent; apply also no-ops without a pool.
-
 export type LiveVitals = {
 	Health: number,
-	Energy: number,
+	Mana: number,
+	Rage: number,
 	Focus: number,
-	Momentum: number,
-	Guard: number,
-	Charge: number,
-	Overdrive: number,
-	AstralPower: number,
-	StaminaResource: number,
+	Energy: number,
+	Happiness: number,
+	Rune: number,
+	RunicPower: number,
 }
 
 local VitalsSnapshot = {}
@@ -26,38 +21,30 @@ function VitalsSnapshot.apply(profileVitals: LiveVitals, live: LiveVitals, hasPo
 	if not hasPool then
 		return
 	end
-	profileVitals.Health = live.Health
-	profileVitals.Energy = live.Energy
-	profileVitals.Focus = live.Focus
-	profileVitals.Momentum = live.Momentum
-	profileVitals.Guard = live.Guard
-	profileVitals.Charge = live.Charge
-	profileVitals.Overdrive = live.Overdrive
-	profileVitals.AstralPower = live.AstralPower
-	profileVitals.StaminaResource = live.StaminaResource
+	for key, value in live do
+		profileVitals[key] = value
+	end
 end
 
 function VitalsSnapshot.fromService(
 	health: number,
-	energy: number,
+	mana: number,
+	rage: number,
 	focus: number,
-	momentum: number,
-	guard: number,
-	charge: number,
-	overdrive: number,
-	astralPower: number,
-	staminaResource: number
+	energy: number,
+	happiness: number,
+	rune: number,
+	runicPower: number
 ): LiveVitals
 	return {
 		Health = health,
-		Energy = energy,
+		Mana = mana,
+		Rage = rage,
 		Focus = focus,
-		Momentum = momentum,
-		Guard = guard,
-		Charge = charge,
-		Overdrive = overdrive,
-		AstralPower = astralPower,
-		StaminaResource = staminaResource,
+		Energy = energy,
+		Happiness = happiness,
+		Rune = rune,
+		RunicPower = runicPower,
 	}
 end
 
