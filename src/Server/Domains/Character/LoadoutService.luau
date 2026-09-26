@@ -27,9 +27,6 @@ local function copyStrings(src: { string }): { string }
 	return out
 end
 
-local function copyMasteries(src: { [string]: number }): { [string]: number }
-	return table.clone(src)
-end
 
 local function copyBars(src: { ActionBarSave }): { ActionBarSave }
 	local out: { ActionBarSave } = {}
@@ -57,7 +54,6 @@ local function makeLoadout(
 		Name = name,
 		Equipment = equipment,
 		Talents = talents,
-		Masteries = masteries,
 		ActionBars = actionBars,
 	}
 end
@@ -104,7 +100,6 @@ function LoadoutService:Save(player: Player, name: string): Result.Result<string
 		trimmed,
 		copyEquipment(profile.Equipment),
 		copyStrings(profile.Talents),
-		copyMasteries(profile.Masteries),
 		copyBars(profile.ActionBars)
 	)
 	local savedId = snapshot.Id
@@ -150,7 +145,6 @@ function LoadoutService:Activate(player: Player, loadoutId: string): Result.Resu
 	_data:Mutate(player, function(p)
 		p.Equipment = copyEquipment(loadout.Equipment)
 		p.Talents = copyStrings(loadout.Talents)
-		p.Masteries = copyMasteries(loadout.Masteries)
 		p.ActionBars = copyBars(loadout.ActionBars)
 		p.ActiveLoadoutId = loadout.Id
 	end)
