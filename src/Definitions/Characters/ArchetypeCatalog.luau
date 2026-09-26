@@ -1,5 +1,8 @@
 --!strict
 
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local StatTypes = require(ReplicatedStorage.Shared.Types.StatTypes)
+
 export type ArchetypeRole = "Tank" | "Healer" | "MeleeDps" | "RangedDps" | "Caster" | "Support" | "Hybrid"
 
 export type ArchetypeDefinition = {
@@ -7,7 +10,7 @@ export type ArchetypeDefinition = {
 	Name: string,
 	Role: ArchetypeRole,
 	PrimaryStats: { string },
-	ResourceBias: string?,
+	PowerType: StatTypes.PowerType,
 	Specializations: { string },
 	Abilities: { string },
 	SignatureAbilityId: string,
@@ -19,7 +22,7 @@ local ArchetypeCatalog: { [string]: ArchetypeDefinition } = {
 		Name = "Warden",
 		Role = "Tank",
 		PrimaryStats = { "Strength", "Stamina", "Intellect" },
-		ResourceBias = "Guard",
+		PowerType = "Rage",
 		Specializations = { "Aegis", "SpecPulse" },
 		Abilities = {
 			"Pulse",
@@ -48,7 +51,7 @@ local ArchetypeCatalog: { [string]: ArchetypeDefinition } = {
 		Name = "Weaver",
 		Role = "Caster",
 		PrimaryStats = { "Intellect", "Spirit", "Stamina" },
-		ResourceBias = "Focus",
+		PowerType = "Focus",
 		Specializations = { "SpecRift", "SpecMend" },
 		Abilities = {
 			"Pulse",
@@ -88,7 +91,7 @@ local ArchetypeCatalog: { [string]: ArchetypeDefinition } = {
 		Name = "Stalker",
 		Role = "MeleeDps",
 		PrimaryStats = { "Agility", "Strength", "Stamina" },
-		ResourceBias = "Momentum",
+		PowerType = "Energy",
 		Specializations = { "SpecLash", "SpecExecute" },
 		Abilities = {
 			"Pulse",
@@ -121,7 +124,7 @@ local ArchetypeCatalog: { [string]: ArchetypeDefinition } = {
 		Name = "Luminary",
 		Role = "Healer",
 		PrimaryStats = { "Spirit", "Intellect", "Stamina" },
-		ResourceBias = "AstralPower",
+		PowerType = "Mana",
 		Specializations = { "LuminaryGrace", "LuminaryWard" },
 		Abilities = {
 			"Pulse",
@@ -149,7 +152,7 @@ local ArchetypeCatalog: { [string]: ArchetypeDefinition } = {
 		Name = "Sentinel",
 		Role = "RangedDps",
 		PrimaryStats = { "Agility", "Stamina", "Strength" },
-		ResourceBias = "Focus",
+		PowerType = "Focus",
 		Specializations = { "SentinelMarksman", "SentinelSkirmisher" },
 		Abilities = {
 			"Pulse",
@@ -176,7 +179,7 @@ local ArchetypeCatalog: { [string]: ArchetypeDefinition } = {
 		Name = "Hexwright",
 		Role = "Caster",
 		PrimaryStats = { "Intellect", "Spirit", "Stamina" },
-		ResourceBias = "Focus",
+		PowerType = "Focus",
 		Specializations = { "HexwrightPlague", "HexwrightPact" },
 		Abilities = {
 			"Pulse",
@@ -203,7 +206,7 @@ local ArchetypeCatalog: { [string]: ArchetypeDefinition } = {
 		Name = "Vanguard",
 		Role = "MeleeDps",
 		PrimaryStats = { "Strength", "Stamina", "Agility" },
-		ResourceBias = "Charge",
+		PowerType = "Rage",
 		Specializations = { "VanguardJuggernaut", "VanguardRavager" },
 		Abilities = {
 			"Pulse",
@@ -230,7 +233,7 @@ local ArchetypeCatalog: { [string]: ArchetypeDefinition } = {
 		Name = "Tempest",
 		Role = "Caster",
 		PrimaryStats = { "Intellect", "Spirit", "Agility" },
-		ResourceBias = "Overdrive",
+		PowerType = "RunicPower",
 		Specializations = { "TempestStorm", "TempestFrostfire" },
 		Abilities = {
 			"Pulse",
@@ -257,7 +260,7 @@ local ArchetypeCatalog: { [string]: ArchetypeDefinition } = {
 		Name = "Templar",
 		Role = "Hybrid",
 		PrimaryStats = { "Strength", "Intellect", "Stamina" },
-		ResourceBias = "Guard",
+		PowerType = "Rage",
 		Specializations = { "TemplarCrusader", "TemplarProtector" },
 		Abilities = {
 			"Pulse",
@@ -284,7 +287,7 @@ local ArchetypeCatalog: { [string]: ArchetypeDefinition } = {
 		Name = "Arbiter",
 		Role = "Support",
 		PrimaryStats = { "Spirit", "Intellect", "Stamina" },
-		ResourceBias = "AstralPower",
+		PowerType = "Mana",
 		Specializations = { "ArbiterHerald", "ArbiterOracle" },
 		Abilities = {
 			"Pulse",
@@ -311,7 +314,7 @@ local ArchetypeCatalog: { [string]: ArchetypeDefinition } = {
 		Name = "Dragoon",
 		Role = "MeleeDps",
 		PrimaryStats = { "Agility", "Strength", "Stamina" },
-		ResourceBias = "Momentum",
+		PowerType = "Energy",
 		Specializations = { "DragoonLancer", "DragoonPhantom" },
 		Abilities = {
 			"Pulse",
@@ -338,7 +341,7 @@ local ArchetypeCatalog: { [string]: ArchetypeDefinition } = {
 		Name = "Channeler",
 		Role = "Caster",
 		PrimaryStats = { "Intellect", "Spirit", "Stamina" },
-		ResourceBias = "Focus",
+		PowerType = "Focus",
 		Specializations = { "ChannelerConduit", "ChannelerAnnihilator" },
 		Abilities = {
 			"Pulse",
