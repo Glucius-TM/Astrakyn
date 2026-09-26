@@ -3,7 +3,7 @@
 local GameConstants = {
 	NAME = "ASTRAKYN",
 	SUBTITLE = "Astral Combat Online",
-	SCHEMA_VERSION = 3,
+	SCHEMA_VERSION = 4,
 	RULESET_VERSION = 1,
 	STAT_VERSION = 1,
 	WORLD_VOXEL_SCHEMA = 1,
