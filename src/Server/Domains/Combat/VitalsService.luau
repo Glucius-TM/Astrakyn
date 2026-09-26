@@ -1,310 +1,246 @@
 --!strict
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ClockService = require(script.Parent.Parent.Parent.Platform.Scheduling.ClockService)
 local CombatStateService = require(script.Parent.CombatStateService)
 local ContainerTypes = require(ReplicatedStorage.Shared.Types.ServiceContainerTypes)
-local ExtraPoolCatalog = require(ReplicatedStorage.Definitions.Combat.Stats.ExtraPoolCatalog)
-local ExtraPoolResolver = require(script.Parent.Parent.Stats.ExtraPoolResolver)
-local Id = require(ReplicatedStorage.Shared.Utility.Id)
-local ResourceRegenResolver = require(script.Parent.ResourceRegenResolver)
+local PowerRegenResolver = require(script.Parent.ResourceRegenResolver)
 local StatService = require(script.Parent.Parent.Stats.StatService)
-local UnitRegistry = require(script.Parent.UnitRegistry)
+local StatTypes = require(ReplicatedStorage.Shared.Types.StatTypes)
 
--- Session key is UserId only. Live callers pass Player; Bootstrap passes `{ UserId }`.
 type SessionOwner = Player | { UserId: number }
+type PowerType = StatTypes.PowerType
 
-type LastHitClock = {
-	LastHitAt: (self: LastHitClock, owner: SessionOwner) -> number?,
+local POWER_TYPES: { PowerType } = { "Mana", "Rage", "Focus", "Energy", "Happiness", "Rune", "RunicPower" }
+local DEFAULT_CURRENT: { [string]: number } = {
+	Mana = 100,
+	Rage = 0,
+	Focus = 100,
+	Energy = 100,
+	Happiness = 100,
+	Rune = 6,
+	RunicPower = 0,
 }
 
-local pools: { [number]: { [string]: number } } = {}
-local maxPools: { [number]: { [string]: number } } = {}
+type Vitals = {
+	Health: number,
+	Powers: { [string]: number },
+	MaxHealth: number,
+	MaxPowers: { [string]: number },
+}
 
+local vitalsByUser: { [number]: Vitals } = {}
 local VitalsService = { Name = "VitalsService" }
 local _status: typeof(CombatStateService)?
 local _stats: typeof(StatService)?
-local _combat: LastHitClock?
 
-local function ensure(player: SessionOwner, energy: number, health: number)
-	if pools[player.UserId] == nil then
-		local bag: { [string]: number } = {
-			Energy = energy,
-			Health = health,
-		}
-		local caps: { [string]: number } = {
-			Energy = energy,
-			Health = health,
-		}
-		for _, statId in ExtraPoolCatalog.statIds() do
-			bag[statId] = 0
-			caps[statId] = 0
+local function isPower(resource: string): boolean
+	for _, powerType in POWER_TYPES do
+		if powerType == resource then
+			return true
 		end
-		pools[player.UserId] = bag
-		maxPools[player.UserId] = caps
 	end
+	return false
 end
 
-local function bagOf(player: SessionOwner): { [string]: number }?
-	return pools[player.UserId]
-end
-
-local function capsOf(player: SessionOwner): { [string]: number }?
-	return maxPools[player.UserId]
-end
-
-local function resolvedStatus(current: typeof(CombatStateService)?): typeof(CombatStateService)
-	if current == nil then
-		return CombatStateService
+local function ensure(owner: SessionOwner, energy: number, health: number): Vitals
+	local existing = vitalsByUser[owner.UserId]
+	if existing ~= nil then
+		return existing
 	end
-	return current
-end
-
-local function resolvedStats(current: typeof(StatService)?): typeof(StatService)
-	if current == nil then
-		return StatService
+	local powers: { [string]: number } = {}
+	local maxPowers: { [string]: number } = {}
+	for _, powerType in POWER_TYPES do
+		local maxValue = if powerType == "Rune" then 6 else 100
+		maxPowers[powerType] = maxValue
+		powers[powerType] = math.clamp(DEFAULT_CURRENT[powerType] or 0, 0, maxValue)
 	end
-	return current
-end
-
-local function capFor(caps: { [string]: number }?, resource: string): number
-	if caps == nil then
-		return 0
-	end
-	return caps[resource] or 0
+	powers.Energy = math.clamp(energy, 0, maxPowers.Energy)
+	local created: Vitals = {
+		Health = math.max(0, health),
+		Powers = powers,
+		MaxHealth = math.max(1, health),
+		MaxPowers = maxPowers,
+	}
+	vitalsByUser[owner.UserId] = created
+	return created
 end
 
 function VitalsService:Init(container: ContainerTypes.Container)
 	_status = container:Get(CombatStateService.Name) :: typeof(CombatStateService)
 	_stats = container:Get(StatService.Name) :: typeof(StatService)
-	_combat = container:Get("CombatService") :: LastHitClock
 end
 
 function VitalsService:Start() end
 
-function VitalsService:Ensure(player: SessionOwner, energy: number, health: number)
-	ensure(player, energy, health)
+function VitalsService:Ensure(owner: SessionOwner, energy: number, health: number)
+	ensure(owner, energy, health)
 end
 
-function VitalsService:Has(player: SessionOwner): boolean
-	return pools[player.UserId] ~= nil
+function VitalsService:Has(owner: SessionOwner): boolean
+	return vitalsByUser[owner.UserId] ~= nil
 end
 
-function VitalsService:Get(player: SessionOwner, resource: string): number
-	local bag = bagOf(player)
-	return if bag then bag[resource] or 0 else 0
+function VitalsService:Get(owner: SessionOwner, resource: string): number
+	local state = vitalsByUser[owner.UserId]
+	if state == nil then
+		return 0
+	end
+	if resource == "Health" then
+		return state.Health
+	end
+	if isPower(resource) then
+		return state.Powers[resource] or 0
+	end
+	return 0
 end
 
-function VitalsService:GetMax(player: SessionOwner, resource: string): number
-	return capFor(capsOf(player), resource)
+function VitalsService:GetMax(owner: SessionOwner, resource: string): number
+	local state = vitalsByUser[owner.UserId]
+	if state == nil then
+		return 0
+	end
+	if resource == "Health" then
+		return state.MaxHealth
+	end
+	if isPower(resource) then
+		return state.MaxPowers[resource] or 0
+	end
+	return 0
 end
 
-function VitalsService:CanSpend(player: SessionOwner, resource: string, amount: number): boolean
+function VitalsService:CanSpend(owner: SessionOwner, resource: string, amount: number): boolean
 	if amount <= 0 then
 		return true
 	end
-	local bag = bagOf(player)
-	return bag ~= nil and (bag[resource] or 0) >= amount
+	if not isPower(resource) then
+		return false
+	end
+	return VitalsService:Get(owner, resource) >= amount
 end
 
-function VitalsService:Spend(player: SessionOwner, resource: string, amount: number): boolean
-	ensure(player, 100, 100)
-	if not VitalsService:CanSpend(player, resource, amount) then
+function VitalsService:Spend(owner: SessionOwner, resource: string, amount: number): boolean
+	local state = ensure(owner, 100, 100)
+	if amount <= 0 then
+		return true
+	end
+	if not isPower(resource) or (state.Powers[resource] or 0) < amount then
 		return false
 	end
-	local bag = bagOf(player)
-	if bag == nil then
-		return false
-	end
-	bag[resource] -= amount
+	state.Powers[resource] -= amount
 	return true
 end
 
-function VitalsService:Gain(player: SessionOwner, resource: string, amount: number)
-	ensure(player, 100, 100)
-	local bag = bagOf(player)
-	local caps = capsOf(player)
-	if bag == nil then
+function VitalsService:Gain(owner: SessionOwner, resource: string, amount: number)
+	local state = ensure(owner, 100, 100)
+	if resource == "Health" then
+		state.Health = math.clamp(state.Health + amount, 0, state.MaxHealth)
 		return
 	end
-	local cap = capFor(caps, resource)
-	if cap <= 0 then
+	if not isPower(resource) then
 		return
 	end
-	bag[resource] = math.min(cap, (bag[resource] or 0) + amount)
+	local cap = state.MaxPowers[resource] or 0
+	state.Powers[resource] = math.clamp((state.Powers[resource] or 0) + amount, 0, cap)
 end
 
-function VitalsService:Set(player: SessionOwner, resource: string, value: number)
-	ensure(player, 100, 100)
-	local bag = bagOf(player)
-	local caps = capsOf(player)
-	if bag == nil then
+function VitalsService:Set(owner: SessionOwner, resource: string, value: number)
+	local state = ensure(owner, 100, 100)
+	if resource == "Health" then
+		state.Health = math.clamp(value, 0, state.MaxHealth)
 		return
 	end
-	local cap = capFor(caps, resource)
-	if cap <= 0 then
-		bag[resource] = 0
+	if not isPower(resource) then
 		return
 	end
-	bag[resource] = math.clamp(value, 0, cap)
+	state.Powers[resource] = math.clamp(value, 0, state.MaxPowers[resource] or 0)
 end
 
-function VitalsService:SetMax(player: SessionOwner, resource: string, maxValue: number)
-	ensure(player, 100, 100)
-	local caps = capsOf(player)
-	local bag = bagOf(player)
-	if caps == nil or bag == nil then
+function VitalsService:SetMax(owner: SessionOwner, resource: string, maxValue: number)
+	local state = ensure(owner, 100, 100)
+	if resource == "Health" then
+		state.MaxHealth = math.max(1, maxValue)
+		state.Health = math.min(state.Health, state.MaxHealth)
 		return
 	end
-	caps[resource] = math.max(0, maxValue)
-	bag[resource] = math.min(bag[resource] or caps[resource], caps[resource])
-end
-
-function VitalsService:SyncPoolMaxes(player: SessionOwner, values: { [string]: number })
-	for _, statId in ExtraPoolCatalog.statIds() do
-		VitalsService:SetMax(player, statId, math.max(0, values[statId] or 0))
+	if not isPower(resource) then
+		return
 	end
+	state.MaxPowers[resource] = math.max(0, maxValue)
+	state.Powers[resource] = math.min(state.Powers[resource] or 0, state.MaxPowers[resource])
 end
 
-function VitalsService:ApplyExtraPoolGains(
-	player: SessionOwner,
-	damageDealt: number,
-	damageTaken: number,
-	comboAdded: boolean
-)
-	for _, statId in ExtraPoolCatalog.statIds() do
-		local gain = ExtraPoolResolver.onDamageDealt(statId, damageDealt)
-			+ ExtraPoolResolver.onDamageTaken(statId, damageTaken)
-		if comboAdded then
-			gain += ExtraPoolResolver.onComboAdd(statId)
-		end
-		if gain > 0 then
-			VitalsService:Gain(player, statId, gain)
-		end
+function VitalsService:SyncPoolMaxes(owner: SessionOwner, values: { [string]: number })
+	VitalsService:SetMax(owner, "Health", math.max(1, values.MaxHealth or 100))
+	for _, powerType in POWER_TYPES do
+		VitalsService:SetMax(owner, powerType, math.max(0, values[powerType] or (if powerType == "Rune" then 6 else 100)))
 	end
 end
 
 function VitalsService:Tick(dt: number)
-	for userId, bag in pools do
+	local status = _status or CombatStateService
+	local stats = _stats or StatService
+	for userId, state in vitalsByUser do
 		local owner: SessionOwner = { UserId = userId }
-		local caps = maxPools[userId]
-		local energyCap = capFor(caps, "Energy")
-		if energyCap <= 0 then
-			energyCap = 100
-		end
-		local healthCap = capFor(caps, "Health")
-		if healthCap <= 0 then
-			healthCap = 100
-		end
-		local status = resolvedStatus(_status)
-		local stats = resolvedStats(_stats)
-		local state = status:Get(owner)
-		local values = stats:TryGetValues(owner)
-		local energyRegen: number? = nil
-		local healthRegen: number? = nil
-		if values ~= nil then
-			energyRegen = values.ResourceRegen
-			healthRegen = values.HealthRegen or 0
-		end
+		local combatState = status:Get(owner)
 		local inCombat = status:IsInCombat(owner)
-		local energyRate = ResourceRegenResolver.energyRate(energyRegen, inCombat)
-		bag.Energy = math.min(energyCap, (bag.Energy or 0) + energyRate * dt)
-		local hp = bag.Health or 0
-		if not inCombat and state ~= "Dead" and hp > 0 and hp < healthCap then
-			local healthRate = ResourceRegenResolver.healthRate(healthRegen)
-			bag.Health = math.min(healthCap, hp + healthRate * dt)
-		end
-		if not inCombat and state ~= "Dead" then
-			local combat = _combat
-			if combat ~= nil and values ~= nil then
-				local recharge = values.ShieldRecharge or 0
-				if recharge > 0 then
-					local delay = values.ShieldRechargeDelay or 3
-					local hitAt = combat:LastHitAt(owner)
-					local now = ClockService.now()
-					if hitAt == nil or now - hitAt >= delay then
-						UnitRegistry.addAbsorb(
-							Id.player(userId),
-							recharge * dt,
-							values.ShieldCapacity,
-							values.ShieldOvercharge,
-							values.ShieldEfficiency
-						)
+		local values = stats:TryGetValues(owner)
+		if values ~= nil then
+			if not inCombat and combatState ~= "Dead" and state.Health > 0 and state.Health < state.MaxHealth then
+				state.Health = math.min(state.MaxHealth, state.Health + PowerRegenResolver.healthRate(values.HealthRegen) * dt)
+			end
+			if combatState ~= "Dead" then
+				for _, powerType in POWER_TYPES do
+					local rate = PowerRegenResolver.powerRate(powerType, values, inCombat)
+					if rate ~= 0 then
+						local cap = state.MaxPowers[powerType] or 0
+						state.Powers[powerType] = math.clamp((state.Powers[powerType] or 0) + rate * dt, 0, cap)
 					end
 				end
 			end
 		end
-		for _, statId in ExtraPoolCatalog.statIds() do
-			local maxVal = capFor(caps, statId)
-			if maxVal <= 0 then
-				bag[statId] = 0
-				continue
-			end
-			local rate = ExtraPoolResolver.tickRate(statId, inCombat)
-			if rate == 0 then
-				continue
-			end
-			local current = bag[statId] or 0
-			if rate > 0 then
-				bag[statId] = math.min(maxVal, current + rate * dt)
-			else
-				bag[statId] = math.max(0, current + rate * dt)
-			end
-		end
-	end
-end
-
-local function maxRemoteKey(remoteKey: string): string
-	return "max" .. string.upper(string.sub(remoteKey, 1, 1)) .. string.sub(remoteKey, 2)
-end
-
-function VitalsService:AppendExtraPoolPayload(payload: { [string]: number }, player: SessionOwner)
-	for _, entry in ExtraPoolCatalog.all() do
-		payload[entry.RemoteKey] = VitalsService:Get(player, entry.StatId)
-		payload[maxRemoteKey(entry.RemoteKey)] = VitalsService:GetMax(player, entry.StatId)
 	end
 end
 
 function VitalsService:BuildRemotePayload(
-	player: SessionOwner,
+	owner: SessionOwner,
 	combo: number,
 	haste: number,
 	armor: number,
 	absorb: number
 ): { [string]: number }
 	local payload: { [string]: number } = {
-		hp = VitalsService:Get(player, "Health"),
-		maxHp = VitalsService:GetMax(player, "Health"),
-		energy = VitalsService:Get(player, "Energy"),
-		maxEnergy = VitalsService:GetMax(player, "Energy"),
+		hp = VitalsService:Get(owner, "Health"),
+		maxHp = VitalsService:GetMax(owner, "Health"),
 		absorb = absorb,
 		combo = combo,
 		haste = haste,
 		armor = armor,
 	}
-	VitalsService:AppendExtraPoolPayload(payload, player)
+	for _, powerType in POWER_TYPES do
+		local key = string.lower(string.sub(powerType, 1, 1)) .. string.sub(powerType, 2)
+		payload[key] = VitalsService:Get(owner, powerType)
+		payload["max" .. powerType] = VitalsService:GetMax(owner, powerType)
+	end
 	return payload
 end
 
-function VitalsService:Clear(player: SessionOwner)
-	pools[player.UserId] = nil
-	maxPools[player.UserId] = nil
-end
-
-function VitalsService:ListActivePools(player: SessionOwner): { { statId: string, current: number, max: number } }
-	local rows: { { statId: string, current: number, max: number } } = {}
-	for _, statId in ExtraPoolCatalog.statIds() do
-		local maxVal = VitalsService:GetMax(player, statId)
-		if maxVal <= 0 then
-			continue
+function VitalsService:ListPowers(owner: SessionOwner): { { powerType: string, current: number, max: number } }
+	local rows: { { powerType: string, current: number, max: number } } = {}
+	for _, powerType in POWER_TYPES do
+		local maxValue = VitalsService:GetMax(owner, powerType)
+		if maxValue > 0 then
+			table.insert(rows, {
+				powerType = powerType,
+				current = VitalsService:Get(owner, powerType),
+				max = maxValue,
+			})
 		end
-		table.insert(rows, {
-			statId = statId,
-			current = VitalsService:Get(player, statId),
-			max = maxVal,
-		})
 	end
 	return rows
+end
+
+function VitalsService:Clear(owner: SessionOwner)
+	vitalsByUser[owner.UserId] = nil
 end
 
 return VitalsService
