@@ -1,33 +1,31 @@
 --!strict
 
--- EnergyRegen / HealthRegen → resource ticks. Pure; no remotes, no persistence.
+local PowerRegenResolver = {}
 
-local FALLBACK_ENERGY_COMBAT = 4
-local FALLBACK_ENERGY_OOC = 8
-local FALLBACK_HEALTH_OOC = 4
-local RATE_MAX = 50
-
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local GameConstants = require(ReplicatedStorage.Shared.Constants.GameConstants)
-
-local ResourceRegenResolver = {}
-
-function ResourceRegenResolver.energyRate(energyRegen: number?, inCombat: boolean): number
-	if energyRegen == nil then
-		return if inCombat then FALLBACK_ENERGY_COMBAT else FALLBACK_ENERGY_OOC
-	end
-	local rate = math.clamp(energyRegen, 0, RATE_MAX)
-	if inCombat then
-		return rate * GameConstants.COMBAT_ENERGY_REGEN_FACTOR
-	end
-	return rate
+function PowerRegenResolver.healthRate(configured: number?): number
+	return math.max(0, configured or 0)
 end
 
-function ResourceRegenResolver.healthRate(healthRegen: number?): number
-	if healthRegen == nil then
-		return FALLBACK_HEALTH_OOC
+function PowerRegenResolver.powerRate(
+	powerType: string,
+	values: { [string]: number },
+	inCombat: boolean
+): number
+	if powerType == "Mana" then
+		local base = values.ManaRegen or ((values.Spirit or 0) * 0.2)
+		return if inCombat then base * 0.3 else base
+	elseif powerType == "Energy" then
+		return values.EnergyRegen or 10
+	elseif powerType == "Focus" then
+		return values.FocusRegen or 5
+	elseif powerType == "Rage" then
+		return if inCombat then 0 else -2
+	elseif powerType == "RunicPower" then
+		return if inCombat then 0 else -2
+	elseif powerType == "Happiness" or powerType == "Rune" then
+		return 0
 	end
-	return math.clamp(healthRegen, 0, RATE_MAX)
+	return 0
 end
 
-return ResourceRegenResolver
+return PowerRegenResolver
