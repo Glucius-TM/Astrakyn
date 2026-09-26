@@ -166,9 +166,6 @@ function ProfileValidator.validate(profile: PlayerProfile): ValidateResult
 	if typeof(profile.Progression) ~= "table" then
 		return Result.err("invalid Progression")
 	end
-	if typeof(profile.Progression.MasteryPoints) ~= "number" then
-		return Result.err("invalid MasteryPoints")
-	end
 	if typeof(profile.Progression.Deaths) ~= "number" then
 		return Result.err("invalid Deaths")
 	end
@@ -364,49 +361,14 @@ function ProfileValidator.validate(profile: PlayerProfile): ValidateResult
 	if typeof(profile.Vitals) ~= "table" then
 		return Result.err("invalid Vitals")
 	end
-	if typeof(profile.Vitals.Focus) ~= "number" then
-		return Result.err("invalid Vitals.Focus")
-	end
-	if typeof(profile.Vitals.Momentum) ~= "number" then
-		return Result.err("invalid Vitals.Momentum")
-	end
-	if typeof(profile.Vitals.Guard) ~= "number" then
-		return Result.err("invalid Vitals.Guard")
-	end
-	if typeof(profile.Vitals.Charge) ~= "number" then
-		return Result.err("invalid Vitals.Charge")
-	end
-	if typeof(profile.Vitals.Overdrive) ~= "number" then
-		return Result.err("invalid Vitals.Overdrive")
-	end
-	if typeof(profile.Vitals.AstralPower) ~= "number" then
-		return Result.err("invalid Vitals.AstralPower")
-	end
-	if typeof(profile.Vitals.StaminaResource) ~= "number" then
-		return Result.err("invalid Vitals.StaminaResource")
-	end
-	if typeof(profile.Settlements) ~= "table" then
-		return Result.err("invalid Settlements")
-	end
-	for _, row in profile.Settlements do
-		if typeof(row) ~= "table" then
-			return Result.err("invalid settlement row")
+	local vitalFields = { "Health", "Mana", "Rage", "Focus", "Energy", "Happiness", "Rune", "RunicPower" }
+	for _, field in vitalFields do
+		if typeof(profile.Vitals[field]) ~= "number" then
+			return Result.err(`invalid Vitals.{field}`)
 		end
-		if typeof(row.Id) ~= "string" or typeof(row.ZoneId) ~= "string" or typeof(row.ClaimedAt) ~= "number" then
-			return Result.err("invalid settlement fields")
+		if profile.Vitals[field] < 0 then
+			return Result.err(`negative Vitals.{field}`)
 		end
-		if typeof(row.OwnerUserId) ~= "number" or typeof(row.OwnershipScore) ~= "number" then
-			return Result.err("invalid settlement ownership")
-		end
-		if typeof(row.StructureCount) ~= "number" or typeof(row.ScoredAt) ~= "number" then
-			return Result.err("invalid settlement score")
-		end
-		if typeof(row.GuildId) ~= "string" then
-			return Result.err("invalid settlement guild")
-		end
-	end
-	if #profile.Settlements > 8 then
-		return Result.err("too many settlements")
 	end
 	if typeof(profile.Loadouts) ~= "table" then
 		return Result.err("invalid Loadouts")
@@ -424,7 +386,7 @@ function ProfileValidator.validate(profile: PlayerProfile): ValidateResult
 		if typeof(build.Equipment) ~= "table" or typeof(build.Talents) ~= "table" then
 			return Result.err("invalid build loadout")
 		end
-		if typeof(build.Masteries) ~= "table" or typeof(build.ActionBars) ~= "table" then
+		if typeof(build.ActionBars) ~= "table" then
 			return Result.err("invalid build bars")
 		end
 	end
