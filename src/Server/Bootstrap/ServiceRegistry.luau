@@ -15,7 +15,6 @@ local ClockService = require(ServerScriptService.Platform.Scheduling.ClockServic
 local CombatService = require(ServerScriptService.Domains.Combat.CombatService)
 local CombatStateService = require(ServerScriptService.Domains.Combat.CombatStateService)
 local ComboService = require(ServerScriptService.Domains.Combat.ComboService)
-local ConstructionService = require(ServerScriptService.Domains.Settlement.ConstructionService)
 local CooldownService = require(ServerScriptService.Domains.Combat.CooldownService)
 local CraftingService = require(ServerScriptService.Domains.Economy.CraftingService)
 local DataService = require(ServerScriptService.Platform.Persistence.DataService)
@@ -29,13 +28,9 @@ local GuildService = require(ServerScriptService.Domains.Guild.GuildService)
 local InventoryService = require(ServerScriptService.Domains.Items.InventoryService)
 local KnownAbilityService = require(ServerScriptService.Domains.Character.KnownAbilityService)
 local LeaderboardService = require(ServerScriptService.Domains.Progression.LeaderboardService)
-local LiveOpsService = require(ServerScriptService.Domains.LiveOps.LiveOpsService)
 local LoadoutService = require(ServerScriptService.Domains.Character.LoadoutService)
 local LootService = require(ServerScriptService.Domains.Items.LootService)
-local MachineService = require(ServerScriptService.Domains.Settlement.MachineService)
-local MacroService = require(ServerScriptService.Domains.Macro.MacroService)
 local MailService = require(ServerScriptService.Domains.Social.MailService)
-local MasteryService = require(ServerScriptService.Domains.Progression.MasteryService)
 local MatchmakingService = require(ServerScriptService.Domains.Matchmaking.MatchmakingService)
 local MemoryCoordinationService = require(ServerScriptService.Platform.CrossServer.MemoryCoordinationService)
 local MovementGuardService = require(ServerScriptService.Platform.Security.MovementGuardService)
@@ -49,7 +44,6 @@ local RaidService = require(ServerScriptService.Domains.Instances.RaidService)
 local ReputationService = require(ServerScriptService.Domains.Progression.ReputationService)
 local RuntimeConfigService = require(ServerScriptService.Platform.Config.RuntimeConfigService)
 local SecurityService = require(ServerScriptService.Platform.Security.SecurityService)
-local SettlementService = require(ServerScriptService.Domains.Settlement.SettlementService)
 local SocialService = require(ServerScriptService.Domains.Social.SocialService)
 local StatService = require(ServerScriptService.Domains.Stats.StatService)
 local TalentService = require(ServerScriptService.Domains.Progression.TalentService)
@@ -87,7 +81,6 @@ export type App = {
 	EquipmentService: typeof(EquipmentService),
 	FlightService: typeof(FlightService),
 	TalentService: typeof(TalentService),
-	MasteryService: typeof(MasteryService),
 	EconomyService: typeof(EconomyService),
 	LootService: typeof(LootService),
 	KnownAbilityService: typeof(KnownAbilityService),
@@ -98,9 +91,6 @@ export type App = {
 	SocialService: typeof(SocialService),
 	QuestService: typeof(QuestService),
 	WorldService: typeof(WorldService),
-	ConstructionService: typeof(ConstructionService),
-	MachineService: typeof(MachineService),
-	SettlementService: typeof(SettlementService),
 	DungeonService: typeof(DungeonService),
 	EncounterLockoutService: typeof(EncounterLockoutService),
 	BossService: typeof(BossService),
@@ -115,12 +105,10 @@ export type App = {
 	MatchmakingService: typeof(MatchmakingService),
 	CraftingService: typeof(CraftingService),
 	ReputationService: typeof(ReputationService),
-	MacroService: typeof(MacroService),
 	MovementGuardService: typeof(MovementGuardService),
 	VfxBudgetService: typeof(VfxBudgetService),
 	ChatService: typeof(ChatService),
 	LeaderboardService: typeof(LeaderboardService),
-	LiveOpsService: typeof(LiveOpsService),
 }
 
 local ServiceRegistry = {}
@@ -150,7 +138,6 @@ function ServiceRegistry.registerAll(): (typeof(ServiceContainer), App)
 	ServiceContainer:Register(EquipmentService.Name, EquipmentService)
 	ServiceContainer:Register(FlightService.Name, FlightService)
 	ServiceContainer:Register(TalentService.Name, TalentService)
-	ServiceContainer:Register(MasteryService.Name, MasteryService)
 	ServiceContainer:Register(EconomyService.Name, EconomyService)
 	ServiceContainer:Register(LootService.Name, LootService)
 	ServiceContainer:Register(KnownAbilityService.Name, KnownAbilityService)
@@ -161,9 +148,6 @@ function ServiceRegistry.registerAll(): (typeof(ServiceContainer), App)
 	ServiceContainer:Register(SocialService.Name, SocialService)
 	ServiceContainer:Register(QuestService.Name, QuestService)
 	ServiceContainer:Register(WorldService.Name, WorldService)
-	ServiceContainer:Register(ConstructionService.Name, ConstructionService)
-	ServiceContainer:Register(MachineService.Name, MachineService)
-	ServiceContainer:Register(SettlementService.Name, SettlementService)
 	ServiceContainer:Register(DungeonService.Name, DungeonService)
 	ServiceContainer:Register(EncounterLockoutService.Name, EncounterLockoutService)
 	ServiceContainer:Register(BossService.Name, BossService)
@@ -178,12 +162,10 @@ function ServiceRegistry.registerAll(): (typeof(ServiceContainer), App)
 	ServiceContainer:Register(MatchmakingService.Name, MatchmakingService)
 	ServiceContainer:Register(CraftingService.Name, CraftingService)
 	ServiceContainer:Register(ReputationService.Name, ReputationService)
-	ServiceContainer:Register(MacroService.Name, MacroService)
 	ServiceContainer:Register(MovementGuardService.Name, MovementGuardService)
 	ServiceContainer:Register(VfxBudgetService.Name, VfxBudgetService)
 	ServiceContainer:Register(ChatService.Name, ChatService)
 	ServiceContainer:Register(LeaderboardService.Name, LeaderboardService)
-	ServiceContainer:Register(LiveOpsService.Name, LiveOpsService)
 
 	-- Composition root owns cross-domain resurrection wiring. Combat no longer statically
 	-- requires CharacterService, which keeps World -> AI -> Combat acyclic.
@@ -216,7 +198,6 @@ function ServiceRegistry.registerAll(): (typeof(ServiceContainer), App)
 		EquipmentService = EquipmentService,
 		FlightService = FlightService,
 		TalentService = TalentService,
-		MasteryService = MasteryService,
 		EconomyService = EconomyService,
 		LootService = LootService,
 		KnownAbilityService = KnownAbilityService,
@@ -227,9 +208,6 @@ function ServiceRegistry.registerAll(): (typeof(ServiceContainer), App)
 		SocialService = SocialService,
 		QuestService = QuestService,
 		WorldService = WorldService,
-		ConstructionService = ConstructionService,
-		MachineService = MachineService,
-		SettlementService = SettlementService,
 		DungeonService = DungeonService,
 		EncounterLockoutService = EncounterLockoutService,
 		BossService = BossService,
@@ -244,12 +222,10 @@ function ServiceRegistry.registerAll(): (typeof(ServiceContainer), App)
 		MatchmakingService = MatchmakingService,
 		CraftingService = CraftingService,
 		ReputationService = ReputationService,
-		MacroService = MacroService,
 		MovementGuardService = MovementGuardService,
 		VfxBudgetService = VfxBudgetService,
 		ChatService = ChatService,
 		LeaderboardService = LeaderboardService,
-		LiveOpsService = LiveOpsService,
 	}
 	return ServiceContainer, app
 end
