@@ -5,12 +5,6 @@ local BagTypes = require(script.Parent.BagTypes)
 export type BagMap = BagTypes.BagMap
 export type BankState = BagTypes.BankState
 
-export type MacroSave = {
-	Id: string,
-	Source: string,
-	BarProfile: string,
-}
-
 export type ItemSave = {
 	InstanceId: string,
 	TemplateId: string,
@@ -47,7 +41,6 @@ export type MailSave = {
 	SentAt: number,
 	ExpiresAt: number,
 	ItemTemplateId: string,
-	-- Instance escrow (player Send). Empty ItemInstanceId = template-only system mail.
 	ItemInstanceId: string,
 	ItemLevel: number,
 	Quality: string,
@@ -90,56 +83,53 @@ export type LoadoutSave = {
 	Name: string,
 	Equipment: { [string]: string },
 	Talents: { string },
-	Masteries: { [string]: number },
 	ActionBars: { ActionBarSave },
 }
 
-export type SettlementSave = {
-	Id: string,
-	ZoneId: string,
-	ClaimedAt: number,
-	OwnerUserId: number,
-	OwnershipScore: number,
-	StructureCount: number,
-	ScoredAt: number,
-	GuildId: string,
+export type VitalsSave = {
+	Health: number,
+	Mana: number,
+	Rage: number,
+	Focus: number,
+	Energy: number,
+	Happiness: number,
+	Rune: number,
+	RunicPower: number,
 }
 
--- Play-state snapshot for one alt. Account-scoped fields stay on PlayerProfile:
--- SchemaVersion, Identity, Social, Settings, Roster, Transactions.
+export type ProgressionSave = {
+	Level: number,
+	XP: number,
+	TalentPoints: number,
+	Deaths: number,
+	PlayedSeconds: number,
+	RestXP: number,
+	BindZoneId: string,
+	ProfessionCraft: number,
+	ProfessionSkills: { [string]: number },
+	Lockouts: { [string]: number },
+}
+
+export type CharacterIdentitySave = {
+	Created: boolean,
+	ArchetypeId: string,
+	SpecializationId: string,
+	RaceId: string,
+	OriginId: string,
+	Name: string,
+	TransformationId: string,
+}
+
+-- CharacterSave is one character slot. Account-scoped state remains on PlayerProfile.
 export type CharacterSave = {
 	Id: string,
-	Character: {
-		Created: boolean,
-		ArchetypeId: string,
-		SpecializationId: string,
-		RaceId: string,
-		OriginId: string,
-		Name: string,
-		TransformationId: string,
-	},
-	Progression: {
-		Level: number,
-		XP: number,
-		TalentPoints: number,
-		EndgameScore: number,
-		MasteryPoints: number,
-		Deaths: number,
-		PlayedSeconds: number,
-		RestXP: number,
-		BindZoneId: string,
-		ProfessionCraft: number,
-		ProfessionSkills: { [string]: number },
-		Lockouts: { [string]: number },
-	},
-	Stats: { [string]: number },
+	Character: CharacterIdentitySave,
+	Progression: ProgressionSave,
 	Equipment: { [string]: string },
 	Bags: BagMap,
 	Bank: BankState,
 	Abilities: { string },
 	Talents: { string },
-	Masteries: { [string]: number },
-	Macros: { MacroSave },
 	ActionBars: { ActionBarSave },
 	Loadouts: { LoadoutSave },
 	ActiveLoadoutId: string,
@@ -152,18 +142,7 @@ export type CharacterSave = {
 	Collections: { string },
 	Mail: { MailSave },
 	AuctionEscrow: { AuctionSave },
-	Vitals: {
-		Health: number,
-		Energy: number,
-		Focus: number,
-		Momentum: number,
-		Guard: number,
-		Charge: number,
-		Overdrive: number,
-		AstralPower: number,
-		StaminaResource: number,
-	},
-	Settlements: { SettlementSave },
+	Vitals: VitalsSave,
 	Cosmetics: { string },
 	PvP: { MMR: number, Wins: number, Losses: number, DeserterUntil: number, HonorEarned: number, SeasonWins: number },
 }
@@ -181,28 +160,12 @@ export type PlayerProfile = {
 		Name: string,
 		TransformationId: string,
 	},
-	Progression: {
-		Level: number,
-		XP: number,
-		TalentPoints: number,
-		EndgameScore: number,
-		MasteryPoints: number,
-		Deaths: number,
-		PlayedSeconds: number,
-		RestXP: number,
-		BindZoneId: string,
-		ProfessionCraft: number,
-		ProfessionSkills: { [string]: number },
-		Lockouts: { [string]: number },
-	},
-	Stats: { [string]: number },
+	Progression: ProgressionSave,
 	Equipment: { [string]: string },
 	Bags: BagMap,
 	Bank: BankState,
 	Abilities: { string },
 	Talents: { string },
-	Masteries: { [string]: number },
-	Macros: { MacroSave },
 	ActionBars: { ActionBarSave },
 	Loadouts: { LoadoutSave },
 	ActiveLoadoutId: string,
@@ -221,18 +184,7 @@ export type PlayerProfile = {
 	Mail: { MailSave },
 	AuctionEscrow: { AuctionSave },
 	Transactions: { [string]: TransactionReceiptSave },
-	Vitals: {
-		Health: number,
-		Energy: number,
-		Focus: number,
-		Momentum: number,
-		Guard: number,
-		Charge: number,
-		Overdrive: number,
-		AstralPower: number,
-		StaminaResource: number,
-	},
-	Settlements: { SettlementSave },
+	Vitals: VitalsSave,
 	Social: { Friends: { number }, Blocked: { number }, MuteUntil: number },
 	Settings: { [string]: string },
 	Cosmetics: { string },
