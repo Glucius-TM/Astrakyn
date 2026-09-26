@@ -10,8 +10,6 @@ local DEFAULT_SCALING: AbilityScaling = {
 	AbilityPower = 1,
 	AttackPower = 0.15,
 	HealingPower = 1,
-	Mastery = 0.25,
-	Versatility = 0.15,
 	WeaponDamage = 0,
 }
 
@@ -19,8 +17,6 @@ local HEAL_SCALING: AbilityScaling = {
 	AbilityPower = 0,
 	AttackPower = 0,
 	HealingPower = 1,
-	Mastery = 0.3,
-	Versatility = 0.15,
 	WeaponDamage = 0,
 }
 
@@ -28,8 +24,6 @@ local PHYSICAL_SCALING: AbilityScaling = {
 	AbilityPower = 0.4,
 	AttackPower = 0.35,
 	HealingPower = 0,
-	Mastery = 0.2,
-	Versatility = 0.1,
 	WeaponDamage = 0.55,
 }
 
@@ -37,8 +31,6 @@ local ENERGY_SCALING: AbilityScaling = {
 	AbilityPower = 1.15,
 	AttackPower = 0,
 	HealingPower = 0,
-	Mastery = 0.45,
-	Versatility = 0.2,
 	WeaponDamage = 0,
 }
 
@@ -86,7 +78,6 @@ local function a(
 		SFXProfile = { Id = school },
 		CameraProfile = { Id = "Combat" },
 		ComboRules = {},
-		MacroRules = { "ABILITY" },
 	}
 end
 
@@ -133,14 +124,14 @@ local catalog: { AbilityDefinition } = {
 		18,
 		ENERGY_SCALING
 	),
-	a("Ward", "Guard Ward", "Spell", "Energy", "Instant", "Self", 14, 15, { "WardShield" }, 0, nil, "Guard"),
+	a("Ward", "Guard Ward", "Spell", "Energy", "Instant", "Self", 14, 15, { "WardShield" }, 0, nil, "Rage"),
 	a("Mend", "Spirit Mend", "Spell", "Radiant", "Cast", "Ally", 5, 18, { "MendHeal" }, 28, HEAL_SCALING),
-	a("Dash", "Threshold Dash", "Attack", "Energy", "Instant", "Self", 8, 8, { "DashMove" }, 0, nil, "StaminaResource"),
+	a("Dash", "Threshold Dash", "Attack", "Energy", "Instant", "Self", 8, 8, { "DashMove" }, 0, nil, "Energy"),
 	a(
 		"Drain",
 		"Toxic Drain",
 		"Spell",
-		"Toxic",
+		"Electric",
 		"Channel",
 		"Enemy",
 		9,
@@ -149,12 +140,12 @@ local catalog: { AbilityDefinition } = {
 		22,
 		ENERGY_SCALING
 	),
-	a("Silence", "Psychic Silence", "Spell", "Psychic", "Instant", "Enemy", 18, 20, { "SilenceCC" }, 24),
-	a("Rift", "Temporal Rift", "Spell", "Temporal", "Cast", "Ground", 20, 25, { "RiftDamage" }, 30, ENERGY_SCALING),
+	a("Silence", "Psychic Silence", "Spell", "Void", "Instant", "Enemy", 18, 20, { "SilenceCC" }, 24),
+	a("Rift", "Temporal Rift", "Spell", "Energy", "Cast", "Ground", 20, 25, { "RiftDamage" }, 30, ENERGY_SCALING),
 	a("Execute", "Void Execute", "Attack", "Void", "Instant", "Enemy", 12, 25, { "ExecuteDamage" }, 12, ENERGY_SCALING),
 	a(
-		"Overdrive",
-		"Overdrive",
+		"RunicPower",
+		"RunicPower",
 		"Transformation",
 		"Energy",
 		"Instant",
@@ -164,7 +155,7 @@ local catalog: { AbilityDefinition } = {
 		{ "OverdriveForm" },
 		0,
 		nil,
-		"Overdrive"
+		"RunicPower"
 	),
 	a("Taunt", "Threat Pulse", "Attack", "Physical", "Instant", "Enemy", 8, 5, { "TauntThreat" }, 20),
 	a(
@@ -216,7 +207,7 @@ local catalog: { AbilityDefinition } = {
 		"ChronoSpike",
 		"Chrono Spike",
 		"Spell",
-		"Temporal",
+		"Energy",
 		"Instant",
 		"Enemy",
 		10,
@@ -225,8 +216,8 @@ local catalog: { AbilityDefinition } = {
 		24,
 		ENERGY_SCALING
 	),
-	a("VenomBurst", "Venom Burst", "Spell", "Toxic", "Instant", "Enemy", 7, 12, { "VenomDamage" }, 20, ENERGY_SCALING),
-	a("MindSpike", "Mind Spike", "Spell", "Psychic", "Cast", "Enemy", 9, 16, { "MindDamage" }, 28, ENERGY_SCALING),
+	a("VenomBurst", "Venom Burst", "Spell", "Electric", "Instant", "Enemy", 7, 12, { "VenomDamage" }, 20, ENERGY_SCALING),
+	a("MindSpike", "Mind Spike", "Spell", "Void", "Cast", "Enemy", 9, 16, { "MindDamage" }, 28, ENERGY_SCALING),
 	a(
 		"Backstab",
 		"Backstab",
@@ -255,7 +246,7 @@ local catalog: { AbilityDefinition } = {
 	),
 	a("HuntMark", "Hunt Mark", "Spell", "Energy", "Instant", "Enemy", 6, 6, { "HuntMarkBuff" }, 35),
 	a("Ambush", "Ambush", "Attack", "Void", "Instant", "Enemy", 18, 20, { "AmbushDamage" }, 8, PHYSICAL_SCALING),
-	a("Bleed", "Kyn Bleed", "Attack", "Toxic", "Instant", "Enemy", 4, 8, { "BleedAura" }, 8, PHYSICAL_SCALING),
+	a("Bleed", "Kyn Bleed", "Attack", "Electric", "Instant", "Enemy", 4, 8, { "BleedAura" }, 8, PHYSICAL_SCALING),
 	a("BattleMend", "Battle Mend", "Spell", "Radiant", "Instant", "Ally", 8, 16, { "BattleMend" }, 30, HEAL_SCALING),
 	a("Revive", "Astral Recall", "Spell", "Radiant", "Cast", "Ally", 30, 20, { "ReviveLife" }, 30, HEAL_SCALING),
 	a(
@@ -286,7 +277,7 @@ local catalog: { AbilityDefinition } = {
 		{ "ComboDamage" },
 		10,
 		PHYSICAL_SCALING,
-		"Charge"
+		"Rage"
 	),
 	a(
 		"Meteor",
@@ -300,7 +291,7 @@ local catalog: { AbilityDefinition } = {
 		{ "MeteorDamage" },
 		35,
 		ENERGY_SCALING,
-		"AstralPower"
+		"Mana"
 	),
 	a(
 		"FocusFire",
@@ -316,7 +307,7 @@ local catalog: { AbilityDefinition } = {
 		ENERGY_SCALING,
 		"Focus"
 	),
-	a("Sprint", "Sprint", "Attack", "Energy", "Instant", "Self", 15, 5, { "SprintMove" }, 0, nil, "StaminaResource"),
+	a("Sprint", "Sprint", "Attack", "Energy", "Instant", "Self", 15, 5, { "SprintMove" }, 0, nil, "Energy"),
 	a(
 		"Hammerfall",
 		"Hammerfall",
@@ -406,7 +397,7 @@ local catalog: { AbilityDefinition } = {
 		10,
 		PHYSICAL_SCALING
 	),
-	a("RiftStep", "Rift Step", "Attack", "Temporal", "Instant", "Enemy", 14, 10, { "RiftStepMove" }, 26),
+	a("RiftStep", "Rift Step", "Attack", "Energy", "Instant", "Enemy", 14, 10, { "RiftStepMove" }, 26),
 	a("VoidWard", "Void Ward", "Spell", "Void", "Instant", "Self", 16, 18, { "VoidWardShield" }, 0),
 	a(
 		"PulseWave",
@@ -524,7 +515,7 @@ local catalog: { AbilityDefinition } = {
 		{ "LuminaryForm" },
 		0,
 		nil,
-		"AstralPower"
+		"Mana"
 	),
 	a(
 		"SentinelFocus",
@@ -553,7 +544,7 @@ local catalog: { AbilityDefinition } = {
 		{ "SanctuaryShield" },
 		0,
 		HEAL_SCALING,
-		"AstralPower"
+		"Mana"
 	),
 	a(
 		"RenewingLight",
@@ -567,7 +558,7 @@ local catalog: { AbilityDefinition } = {
 		{ "RenewingLightHeal" },
 		30,
 		HEAL_SCALING,
-		"AstralPower"
+		"Mana"
 	),
 	a(
 		"Volley",
@@ -603,7 +594,7 @@ local catalog: { AbilityDefinition } = {
 		"SoulRot",
 		"Soul Rot",
 		"Spell",
-		"Toxic",
+		"Electric",
 		"Cast",
 		"Enemy",
 		8,
@@ -639,7 +630,7 @@ local catalog: { AbilityDefinition } = {
 		{ "VanguardRage" },
 		0,
 		nil,
-		"Charge"
+		"Rage"
 	),
 	a(
 		"Shockwave",
@@ -653,9 +644,9 @@ local catalog: { AbilityDefinition } = {
 		{ "ShockwaveDamage" },
 		12,
 		PHYSICAL_SCALING,
-		"Charge"
+		"Rage"
 	),
-	a("IronWill", "Iron Will", "Spell", "Physical", "Instant", "Self", 20, 14, { "IronWillBuff" }, 0, nil, "Charge"),
+	a("IronWill", "Iron Will", "Spell", "Physical", "Instant", "Self", 20, 14, { "IronWillBuff" }, 0, nil, "Rage"),
 	a(
 		"TempestForm",
 		"Tempest Form",
@@ -668,7 +659,7 @@ local catalog: { AbilityDefinition } = {
 		{ "TempestForm" },
 		0,
 		nil,
-		"Overdrive"
+		"RunicPower"
 	),
 	a(
 		"LightningRod",
@@ -682,7 +673,7 @@ local catalog: { AbilityDefinition } = {
 		{ "LightningRodDamage" },
 		30,
 		ENERGY_SCALING,
-		"Overdrive"
+		"RunicPower"
 	),
 	a(
 		"Hailstorm",
@@ -696,7 +687,7 @@ local catalog: { AbilityDefinition } = {
 		{ "HailstormDamage" },
 		28,
 		ENERGY_SCALING,
-		"Overdrive"
+		"RunicPower"
 	),
 	a(
 		"TemplarAegis",
@@ -710,7 +701,7 @@ local catalog: { AbilityDefinition } = {
 		{ "TemplarAegis" },
 		0,
 		nil,
-		"Guard"
+		"Rage"
 	),
 	a("Judgment", "Judgment", "Spell", "Radiant", "Instant", "Enemy", 8, 16, { "JudgmentDamage" }, 28, ENERGY_SCALING),
 	a(
@@ -725,7 +716,7 @@ local catalog: { AbilityDefinition } = {
 		{ "ConsecrateDamage" },
 		18,
 		ENERGY_SCALING,
-		"Guard"
+		"Rage"
 	),
 	a(
 		"ArbiterVision",
@@ -739,14 +730,14 @@ local catalog: { AbilityDefinition } = {
 		{ "ArbiterVision" },
 		0,
 		nil,
-		"AstralPower"
+		"Mana"
 	),
-	a("Inspire", "Inspire", "Spell", "Radiant", "Instant", "Party", 18, 16, { "InspireBuff" }, 0, nil, "AstralPower"),
+	a("Inspire", "Inspire", "Spell", "Radiant", "Instant", "Party", 18, 16, { "InspireBuff" }, 0, nil, "Mana"),
 	a(
 		"TimeWarp",
 		"Time Warp",
 		"Spell",
-		"Temporal",
+		"Energy",
 		"Instant",
 		"Enemy",
 		12,
@@ -754,7 +745,7 @@ local catalog: { AbilityDefinition } = {
 		{ "TimeWarpDamage", "TimeWarpSlow" },
 		28,
 		ENERGY_SCALING,
-		"AstralPower"
+		"Mana"
 	),
 	a(
 		"DragoonForm",
@@ -768,9 +759,9 @@ local catalog: { AbilityDefinition } = {
 		{ "DragoonForm" },
 		0,
 		nil,
-		"Momentum"
+		"Energy"
 	),
-	a("Skydrive", "Skydrive", "Attack", "Physical", "Instant", "Self", 14, 10, { "SkydriveMove" }, 0, nil, "Momentum"),
+	a("Skydrive", "Skydrive", "Attack", "Physical", "Instant", "Self", 14, 10, { "SkydriveMove" }, 0, nil, "Energy"),
 	a(
 		"Impale",
 		"Impale",
@@ -783,7 +774,7 @@ local catalog: { AbilityDefinition } = {
 		{ "ImpaleDamage" },
 		8,
 		PHYSICAL_SCALING,
-		"Momentum"
+		"Energy"
 	),
 	a(
 		"ChannelerFocus",
@@ -833,7 +824,7 @@ local catalog: { AbilityDefinition } = {
 	a("PaleEvade", "Pale Evade", "Spell", "Cold", "Instant", "Self", 16, 8, { "PaleEvadeBuff" }, 0),
 	a("VoidTouch", "Void Touch", "Spell", "Void", "Instant", "Enemy", 16, 10, { "VoidTouchCC" }, 24),
 	a("TideSurge", "Tide Surge", "Spell", "Radiant", "Instant", "Self", 16, 12, { "TideSurgeHeal" }, 0, HEAL_SCALING),
-	a("ThornSkin", "Thorn Skin", "Spell", "Toxic", "Instant", "Self", 18, 10, { "ThornSkinBuff" }, 0),
+	a("ThornSkin", "Thorn Skin", "Spell", "Electric", "Instant", "Self", 18, 10, { "ThornSkinBuff" }, 0),
 	a(
 		"SkyDash",
 		"Sky Dash",
@@ -846,7 +837,7 @@ local catalog: { AbilityDefinition } = {
 		{ "SkyDashMove" },
 		0,
 		nil,
-		"StaminaResource"
+		"Energy"
 	),
 }
 
