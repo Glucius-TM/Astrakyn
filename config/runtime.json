@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "dataStores": {
+    "scope": "ASTRAKYN"
+  },
+  "featureFlags": {
+    "Macros": true,
+    "PvP": true,
+    "Auction": true,
+    "WorldEvents": true,
+    "Transformations": true,
+    "Chat": true,
+    "Daily": true,
+    "Upgrade": true,
+    "Repair": true,
+    "Collections": true
+  },
+  "balance": {
+    "EnemyHealthMultiplier": 1,
+    "AbilityDamageMultiplier": 1,
+    "DropRateMultiplier": 1
+  }
+}

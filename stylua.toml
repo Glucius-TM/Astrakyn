@@ -1,0 +1,3 @@
+# Keep StyLua close to its stable defaults; only repository-specific ordering is explicit.
+[sort_requires]
+enabled = true

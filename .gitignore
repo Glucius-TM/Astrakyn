@@ -1,0 +1,20 @@
+# Generated build output
+.build/
+sourcemap.json
+.astrakyn-test.project.json
+*.rbxl
+*.rbxlx
+*.rbxl.lock
+*.rbxlx.lock
+
+# Secrets
+.env
+.env.*
+*.secret
+credentials.json
+
+# OS / local IDE state
+.DS_Store
+Thumbs.db
+Desktop.ini
+.idea/

@@ -1,0 +1,25 @@
+name: Quality
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Setup Rokit toolchain
+        uses: paradoxum-games/setup-rokit@v3
+        with:
+          version: 1.2.0
+          cache: true
+      - name: Prepare Lune typedefs
+        run: lune setup
+      - name: Run canonical quality gate
+        run: lune run tools/schema/check.luau

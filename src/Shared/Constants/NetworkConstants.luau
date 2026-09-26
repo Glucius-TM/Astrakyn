@@ -1,0 +1,14 @@
+--!strict
+
+local NetworkConstants = {
+	DEFAULT_RATE_LIMIT = 10,
+	MACRO_RATE_LIMIT = 8,
+	SAVE_MACRO_RATE_LIMIT = 4,
+	COMBAT_RATE_LIMIT = 20,
+	SOCIAL_RATE_LIMIT = 6,
+	ADMIN_RATE_LIMIT = 4,
+	MAX_PAYLOAD_KEYS = 16,
+	MAX_WHISPER = 180,
+}
+
+return NetworkConstants

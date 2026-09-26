@@ -1,0 +1,18 @@
+{
+  "luau-lsp.diagnostics.strictDatamodelTypes": true,
+  "luau-lsp.types.robloxSecurityLevel": "None",
+  "luau-lsp.sourcemap.enabled": true,
+  "luau-lsp.sourcemap.autogenerate": true,
+  "luau-lsp.sourcemap.generatorCommand": "lune run tools/test/sourcemap.luau",
+  "luau-lsp.sourcemap.sourcemapFile": "sourcemap.json",
+  "luau-lsp.sourcemap.includeNonScripts": true,
+  "luau-lsp.sourcemap.useVSCodeWatcher": true,
+  "[luau]": {
+    "editor.defaultFormatter": "JohnnyMorganz.stylua",
+    "editor.formatOnSave": true
+  },
+  "luau-lsp.ignoreGlobs": [
+    "**/_Index/**",
+    "**/.build/**"
+  ]
+}

@@ -1,0 +1,4 @@
+---
+globals:
+  Content:
+    any: true

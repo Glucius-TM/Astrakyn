@@ -1,0 +1,24 @@
+name: Release validation
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  validate-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Setup Rokit toolchain
+        uses: paradoxum-games/setup-rokit@v3
+        with:
+          version: 1.2.0
+          cache: true
+      - name: Prepare Lune typedefs
+        run: lune setup
+      - name: Build and validate production artifact
+        run: lune run tools/build/build_place.luau --release --manifest
