@@ -464,7 +464,6 @@ function CharacterService:RebuildStats(player: Player)
 		_stats:AddModifier(player, OriginCatalog.modifierFor(originDef))
 	end
 	local arch = ArchetypeCatalog.get(profile.Character.ArchetypeId)
-	local powerType = "Energy"
 	if arch then
 		for index, statId in arch.PrimaryStats do
 			local bonus = PRIMARY_STAT_BONUS[index]
@@ -480,7 +479,6 @@ function CharacterService:RebuildStats(player: Player)
 				Priority = 11,
 			})
 		end
-		powerType = arch.PowerType
 	end
 	_talents:Rebuild(player)
 	_equipment:Rebuild(player)
@@ -524,9 +522,6 @@ function CharacterService:RebuildStats(player: Player)
 		_resources:Set(player, "Rune", profile.Vitals.Rune)
 		_resources:Set(player, "RunicPower", profile.Vitals.RunicPower)
 	end
-	-- Keep the active archetype power full only for freshly created characters.
-	-- Builder powers (Rage/RunicPower) deliberately remain at their persisted value.
-	local _activePower = powerType
 	UnitRegistry.register({
 		Id = unitId,
 		Kind = "Player",
@@ -1130,7 +1125,7 @@ function CharacterService:UseGateBind(player: Player): Result.Result<boolean>
 end
 
 function CharacterService:ApplyFood(player: Player, statId: string, value: number, duration: number)
-	_stats:ClearSource(player, "Potion")
+	_stats:ClearSource(player, "Consumable")
 	if statId == "" or duration <= 0 then
 		return
 	end
