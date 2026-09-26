@@ -144,8 +144,8 @@ local catalog: { AbilityDefinition } = {
 	a("Rift", "Temporal Rift", "Spell", "Energy", "Cast", "Ground", 20, 25, { "RiftDamage" }, 30, ENERGY_SCALING),
 	a("Execute", "Void Execute", "Attack", "Void", "Instant", "Enemy", 12, 25, { "ExecuteDamage" }, 12, ENERGY_SCALING),
 	a(
-		"RunicPower",
-		"RunicPower",
+		"Overdrive",
+		"Overdrive",
 		"Transformation",
 		"Energy",
 		"Instant",
