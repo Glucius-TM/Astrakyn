@@ -45,7 +45,7 @@ function Bank.mount(host: WindowHost.WindowHostApi): WindowHost.PanelHandle
 	local function paintItemIconBtn(btn: TextButton, ctx: WindowCtx, templateId: string, quality: string, slot: string)
 		local well = IconWidgets.mountItemSlotIcon(btn)
 		if templateId ~= "" then
-			local icon = IconCatalog.item(templateId, quality, ctx.archetypeId)
+			local icon = IconCatalog.item(templateId, quality, ctx.classId)
 			IconWidgets.paintIconWell(
 				well,
 				icon.assetId,
