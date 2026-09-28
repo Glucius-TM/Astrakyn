@@ -627,7 +627,7 @@ function CharacterLobby.open(callbacks: CharacterLobbyCallbacks): CharacterLobby
 		end
 
 		local raceTint = Paint.raceColor(slot.raceId)
-		local archTint = Paint.archetypeColor(slot.archetypeId)
+		local archTint = Paint.classColor(slot.classId)
 		local blendTint = raceTint:Lerp(archTint, 0.35)
 
 		if shouldAnimate then
@@ -647,10 +647,10 @@ function CharacterLobby.open(callbacks: CharacterLobbyCallbacks): CharacterLobby
 			heroGuild.Text = ""
 		end
 		heroIdentity.Text =
-			IdentityPaint.identityLine(slot.raceId, slot.originId, slot.archetypeId, slot.specializationId)
+			IdentityPaint.identityLine(slot.raceId, slot.originId, slot.classId, slot.specializationId)
 		heroLocation.Text =
 			`{RosterParse.zoneNameOf(slot.lastZoneId)}  ·  Hogar: {RosterParse.zoneNameOf(slot.bindZoneId)}`
-		classMark.Text = `{IdentityPaint.presentationName(slot.archetypeId, "Archetype")}  ·  {IdentityPaint.specName(
+		classMark.Text = `{IdentityPaint.presentationName(slot.classId, "Class")}  ·  {IdentityPaint.specName(
 			slot.specializationId
 		)}`
 		classMark.TextColor3 = archTint
@@ -863,7 +863,7 @@ function CharacterLobby.open(callbacks: CharacterLobbyCallbacks): CharacterLobby
 			"ClassPip",
 			UDim2.fromOffset(10, 10),
 			UDim2.fromOffset(6, SLOT_HEIGHT - 20),
-			Paint.archetypeColor(slot.archetypeId),
+			Paint.classColor(slot.classId),
 			0.05
 		)
 		pip.Active = false
@@ -874,12 +874,12 @@ function CharacterLobby.open(callbacks: CharacterLobbyCallbacks): CharacterLobby
 			Paint.text(row, slot.name, UDim2.fromOffset(24, 4), UDim2.new(1, -32, 0, 26), Enum.TextXAlignment.Left)
 		nameLab.Font = Paint.FontBold
 		nameLab.TextSize = Paint.TextSizeTitle
-		nameLab.TextColor3 = Paint.archetypeColor(slot.archetypeId)
+		nameLab.TextColor3 = Paint.classColor(slot.classId)
 		nameLab.TextTruncate = Enum.TextTruncate.AtEnd
 		nameLab.ZIndex = 9
 
 		local specName = IdentityPaint.specName(slot.specializationId)
-		local className = IdentityPaint.presentationName(slot.archetypeId, "Archetype")
+		local className = IdentityPaint.presentationName(slot.classId, "Class")
 		local raceName = IdentityPaint.presentationName(slot.raceId, "Race")
 		local meta = Paint.text(
 			row,
