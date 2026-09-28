@@ -28,7 +28,7 @@ function WardenFirstHourSpec.run(Harness: Harness)
 
 	local profile = ProfileFactory.empty(42, "WardenCadet")
 	profile.Character.Created = true
-	profile.Character.ArchetypeId = "Warden"
+	profile.Character.ClassId = "Warden"
 	profile.Character.SpecializationId = "Aegis"
 	profile.Progression.Level = 5
 	profile.Progression.ProfessionCraft = 2
@@ -42,7 +42,7 @@ function WardenFirstHourSpec.run(Harness: Harness)
 	profile.Progression.Lockouts["Dungeon_Threshold_NodeUndercroft"] = 0
 
 	local build = BuildResolver.fromProfile(profile, WornBags.flat(profile), "PvE")
-	Harness.assertEqual(build.ArchetypeId, "Warden", "Warden build aggregate")
+	Harness.assertEqual(build.ClassId, "Warden", "Warden build aggregate")
 	Harness.assert(build.GearItemLevel > 0, "equipped gear score")
 
 	local values = StatEngine.Resolver.resolve({}, "PvE")
