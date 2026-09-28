@@ -98,7 +98,7 @@ export type StatSource =
 	"Base"
 	| "Race"
 	| "Origin"
-	| "Archetype"
+	| "Class"
 	| "Level"
 	| "Talent"
 	| "Mastery"
