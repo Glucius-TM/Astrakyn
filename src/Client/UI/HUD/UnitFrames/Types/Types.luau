@@ -18,7 +18,7 @@ export type PlayerVitals = {
 	maxEnergy: number,
 	absorb: number,
 	combo: number,
-	archetypeId: string,
+	classId: string,
 	specializationId: string,
 	pvpFlag: boolean,
 	haste: number,
