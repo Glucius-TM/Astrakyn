@@ -30,7 +30,7 @@ function CharacterHandlers.register(ctx: Context)
 		local raceId = Json.asString(data.raceId)
 		local result = CharacterService:Create(
 			player,
-			Json.stringOr(data.archetypeId, ""),
+			Json.stringOr(data.classId, ""),
 			Json.stringOr(data.specializationId, ""),
 			Json.stringOr(data.name, ""),
 			raceId
@@ -42,7 +42,7 @@ function CharacterHandlers.register(ctx: Context)
 			bootstrapCreatedPlayer(player, false)
 			local created = DataService:Get(player)
 			AnalyticsService:Event(player, "character_created", {
-				archetypeId = Json.stringOr(data.archetypeId, ""),
+				classId = Json.stringOr(data.classId, ""),
 				raceId = if created then created.Character.RaceId else "",
 				originId = if created then created.Character.OriginId else "",
 			})
