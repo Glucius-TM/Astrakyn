@@ -19,7 +19,7 @@ function InspectApply.fromPayload(payload: JsonValue): UiTypes.InspectInfo
 		level = Json.numberOr(data.level, 1),
 		guild = Json.stringOr(data.guild, ""),
 		mmr = Json.numberOr(data.mmr, 1000),
-		archetypeId = Json.stringOr(data.archetypeId, ""),
+		classId = Json.stringOr(data.classId, ""),
 		specializationId = Json.stringOr(data.specializationId, ""),
 		raceId = Json.stringOr(data.raceId, ""),
 		originId = Json.stringOr(data.originId, ""),
