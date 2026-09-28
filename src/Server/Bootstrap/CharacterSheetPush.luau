@@ -165,7 +165,7 @@ function CharacterSheetPush.create(
 				extraPools = if member then VitalsService:ListActivePools(member) else {},
 				raceId = if memberProfile then memberProfile.Character.RaceId else "",
 				originId = if memberProfile then memberProfile.Character.OriginId else "",
-				archetypeId = if memberProfile then memberProfile.Character.ArchetypeId else "",
+				classId = if memberProfile then memberProfile.Character.ClassId else "",
 				specializationId = if memberProfile then memberProfile.Character.SpecializationId else "",
 				racialAbilityId = if memberRace then memberRace.RacialAbilityId else "",
 			})
@@ -214,7 +214,7 @@ function CharacterSheetPush.create(
 		if profile then
 			local aggregate = BuildResolver.fromProfile(profile, WornBags.flat(profile), barProfile)
 			buildPayload = {
-				archetypeId = aggregate.ArchetypeId,
+				classId = aggregate.ClassId,
 				specializationId = aggregate.SpecializationId,
 				raceId = aggregate.RaceId,
 				originId = aggregate.OriginId,
@@ -357,7 +357,7 @@ function CharacterSheetPush.create(
 			characterName = if profile and profile.Character.Name ~= ""
 				then profile.Character.Name
 				else player.DisplayName,
-			archetypeId = if profile then profile.Character.ArchetypeId else "",
+			classId = if profile then profile.Character.ClassId else "",
 			specializationId = if profile then profile.Character.SpecializationId else "",
 			raceId = if profile then profile.Character.RaceId else "",
 			originId = if profile then profile.Character.OriginId else "",
