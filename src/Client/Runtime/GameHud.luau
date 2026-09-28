@@ -416,7 +416,7 @@ function GameHud.setPlayer(hp: number, maxHp: number, energy: number, maxEnergy:
 		combo = combo,
 		haste = S.lastHaste,
 		armor = S.lastArmor,
-		archetypeId = S.lastArchetypeId,
+		classId = S.lastClassId,
 		specializationId = S.lastSpecializationId,
 		raceId = S.lastRaceId,
 		originId = S.lastOriginId,
@@ -813,7 +813,7 @@ remote("Social", "InspectResult").OnClientEvent:Connect(function(payload: JsonVa
 		`Inspect  {info.name}  Lv {string.format("%.0f", info.level)}  {IdentityPaint.identityLine(
 			info.raceId,
 			info.originId,
-			info.archetypeId,
+			info.classId,
 			info.specializationId
 		)}`
 	)
