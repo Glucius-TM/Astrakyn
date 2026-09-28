@@ -101,7 +101,7 @@ function MacroService:GrantDefaults(player: Player)
 	for _, save in profile.Macros do
 		have[save.Id] = true
 	end
-	local seed = StartingMacroCatalog.get(profile.Character.ArchetypeId)
+	local seed = StartingMacroCatalog.get(profile.Character.ClassId)
 	if seed ~= nil and not have[seed.MacroId] then
 		local entry = MacroCatalog.get(seed.MacroId)
 		if entry ~= nil then
