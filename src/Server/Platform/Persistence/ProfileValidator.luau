@@ -1,7 +1,7 @@
 --!strict
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ArchetypeCatalog = require(ReplicatedStorage.Definitions.Characters.ArchetypeCatalog)
+local ClassCatalog = require(ReplicatedStorage.Definitions.Characters.ClassCatalog)
 local GameConstants = require(ReplicatedStorage.Shared.Constants.GameConstants)
 local OriginCatalog = require(ReplicatedStorage.Definitions.Characters.OriginCatalog)
 local ProfileTypes = require(ReplicatedStorage.Shared.Types.ProfileTypes)
@@ -19,7 +19,7 @@ local function playableIdentityError(
 	created: boolean,
 	raceId: string,
 	originId: string,
-	archetypeId: string,
+	classId: string,
 	specializationId: string
 ): string?
 	if RaceCatalog.get(raceId) == nil then
@@ -32,9 +32,9 @@ local function playableIdentityError(
 	if raceDef ~= nil and originId ~= raceDef.CanonicalOriginId then
 		return "origin race mismatch"
 	end
-	if created or archetypeId ~= "" then
-		if ArchetypeCatalog.get(archetypeId) == nil then
-			return "unknown ArchetypeId"
+	if created or classId ~= "" then
+		if ClassCatalog.get(classId) == nil then
+			return "unknown ClassId"
 		end
 	end
 	if created or specializationId ~= "" then
@@ -42,8 +42,8 @@ local function playableIdentityError(
 		if spec == nil then
 			return "unknown SpecializationId"
 		end
-		if spec.ArchetypeId ~= archetypeId then
-			return "spec archetype mismatch"
+		if spec.ClassId ~= classId then
+			return "spec class mismatch"
 		end
 	end
 	return nil
@@ -83,8 +83,8 @@ local function rosterRowError(save: CharacterSave, seenIds: { [string]: boolean 
 	if typeof(save.Character.OriginId) ~= "string" then
 		return "invalid Character.OriginId"
 	end
-	if typeof(save.Character.ArchetypeId) ~= "string" then
-		return "invalid Character.ArchetypeId"
+	if typeof(save.Character.ClassId) ~= "string" then
+		return "invalid Character.ClassId"
 	end
 	if typeof(save.Character.SpecializationId) ~= "string" then
 		return "invalid Character.SpecializationId"
@@ -93,7 +93,7 @@ local function rosterRowError(save: CharacterSave, seenIds: { [string]: boolean 
 		true,
 		save.Character.RaceId,
 		save.Character.OriginId,
-		save.Character.ArchetypeId,
+		save.Character.ClassId,
 		save.Character.SpecializationId
 	)
 end
@@ -123,8 +123,8 @@ function ProfileValidator.validate(profile: PlayerProfile): ValidateResult
 	if typeof(profile.Character.OriginId) ~= "string" then
 		return Result.err("invalid Character.OriginId")
 	end
-	if typeof(profile.Character.ArchetypeId) ~= "string" then
-		return Result.err("invalid Character.ArchetypeId")
+	if typeof(profile.Character.ClassId) ~= "string" then
+		return Result.err("invalid Character.ClassId")
 	end
 	if typeof(profile.Character.SpecializationId) ~= "string" then
 		return Result.err("invalid Character.SpecializationId")
@@ -136,7 +136,7 @@ function ProfileValidator.validate(profile: PlayerProfile): ValidateResult
 		profile.Character.Created == true,
 		profile.Character.RaceId,
 		profile.Character.OriginId,
-		profile.Character.ArchetypeId,
+		profile.Character.ClassId,
 		profile.Character.SpecializationId
 	)
 	if identityErr ~= nil then
