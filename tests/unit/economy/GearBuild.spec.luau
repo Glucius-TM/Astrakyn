@@ -51,10 +51,10 @@ function GearBuildSpec.run(Harness: Harness)
 		Harness.assert(axes.AffixBudget > 0, "affix budget axis")
 	end
 	local profile = ProfileFactory.empty(9, "GearTester")
-	profile.Character.ArchetypeId = "Warden"
+	profile.Character.ClassId = "Warden"
 	profile.Character.SpecializationId = "Guardian"
 	local build = BuildResolver.fromProfile(profile, WornBags.flat(profile), "PvE")
-	Harness.assertEqual(build.ArchetypeId, "Warden", "build archetype")
+	Harness.assertEqual(build.ClassId, "Warden", "build class")
 	Harness.assertEqual(build.ActionBarProfile, "PvE", "build bar profile")
 
 	local blade = ProfileFactory.itemSave("eq-blade", "WardenBlade", 10, "Uncommon", false, 0, 100, 100, "", "", "")
