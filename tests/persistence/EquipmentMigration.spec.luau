@@ -18,7 +18,7 @@ function EquipmentMigrationSpec.run(Harness: Harness)
 	local seed = ProfileFactory.empty(17, "Equip")
 	seed.Character.Created = true
 	seed.Character.Id = "c:17:1"
-	seed.Character.ArchetypeId = "Warden"
+	seed.Character.ClassId = "Warden"
 	seed.Character.SpecializationId = "Aegis"
 	seed.Equipment.MainHand = "item:sword:1"
 	seed.Equipment.Ring1 = "item:ring:1"
