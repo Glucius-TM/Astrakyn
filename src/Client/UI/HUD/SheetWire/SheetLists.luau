@@ -181,7 +181,7 @@ function SheetLists.fill(S: HudState, data: JsonObject, snap: JsonObject?): Fill
 					extraPools = ExtraPools.parsePartyRows(row.extraPools),
 					raceId = Json.stringOr(row.raceId, ""),
 					originId = Json.stringOr(row.originId, ""),
-					archetypeId = Json.stringOr(row.archetypeId, ""),
+					classId = Json.stringOr(row.classId, ""),
 					specializationId = Json.stringOr(row.specializationId, ""),
 					racialAbilityId = Json.stringOr(row.racialAbilityId, ""),
 				})
