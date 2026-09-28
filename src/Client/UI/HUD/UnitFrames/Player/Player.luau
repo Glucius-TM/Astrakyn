@@ -41,7 +41,7 @@ function Player.playerSig(vitals: PlayerVitals): string
 		string.format("%.0f", vitals.absorb),
 		string.format("%.4f", vitals.haste),
 		string.format("%.0f", vitals.armor),
-		vitals.archetypeId,
+		vitals.classId,
 		vitals.specializationId,
 		vitals.raceId,
 		vitals.originId,
@@ -139,18 +139,18 @@ function Player.mount(root: Frame, deps: UnitFramesDeps, shared: ChromeShared): 
 		Paint.setFill(playerUnit.Health, hpRatio)
 		Paint.setFill(playerUnit.Power, vitals.energy / energyCap)
 		Paint.setAbsorb(playerUnit.Health, hpRatio, vitals.absorb / hpCap)
-		Paint.setFillColor(playerUnit.Power, Paint.powerColor(vitals.archetypeId))
+		Paint.setFillColor(playerUnit.Power, Paint.powerColor(vitals.classId))
 		playerUnit.HealthText.Text = `{string.format("%.0f", vitals.hp)} / {string.format("%.0f", vitals.maxHp)}`
 		playerUnit.PowerText.Text = `{string.format("%.0f", vitals.energy)} / {string.format("%.0f", vitals.maxEnergy)}`
 		playerUnit.Name.Text = vitals.name
 		playerUnit.Level.Text = `Lv {string.format("%.0f", vitals.level)}`
-		playerUnit.PortraitText.Text = IdentityPaint.archetypeGlyph(vitals.archetypeId)
-		playerUnit.PortraitText.TextColor3 = Paint.archetypeColor(vitals.archetypeId)
+		playerUnit.PortraitText.Text = IdentityPaint.classGlyph(vitals.classId)
+		playerUnit.PortraitText.TextColor3 = Paint.classColor(vitals.classId)
 		playerUnit.Class.Text =
-			IdentityPaint.identityLine(vitals.raceId, vitals.originId, vitals.archetypeId, vitals.specializationId)
+			IdentityPaint.identityLine(vitals.raceId, vitals.originId, vitals.classId, vitals.specializationId)
 		playerUnit.Class.TextTruncate = Enum.TextTruncate.AtEnd
 		playerUnit.Pvp.Text = if vitals.pvpFlag then "PvP" else ""
-		tintStroke(playerUnit.Portrait, Paint.archetypeColor(vitals.archetypeId))
+		tintStroke(playerUnit.Portrait, Paint.classColor(vitals.classId))
 		lastRatingsText =
 			`Haste {VitalsLogic.formatHaste(vitals.haste)}   Armor {VitalsLogic.formatArmor(vitals.armor)}`
 		ratings.Text = lastRatingsText
