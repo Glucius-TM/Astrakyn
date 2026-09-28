@@ -1,6 +1,6 @@
 --!strict
 
-export type IdentityKind = "Race" | "Origin" | "Archetype"
+export type IdentityKind = "Race" | "Origin" | "Class"
 
 export type IdentityPresentation = {
 	Id: string,
@@ -21,7 +21,7 @@ export type SpecPresentation = {
 
 local GOLD = Color3.fromRGB(212, 175, 55)
 
--- Client Color3 table keyed by ColorKey. Archetype RGB matches Paint Warden/Weaver/Stalker.
+-- Client Color3 table keyed by ColorKey. Class RGB matches Paint Warden/Weaver/Stalker.
 local COLORS: { [string]: Color3 } = {
 	Warden = Color3.fromRGB(72, 128, 196),
 	Weaver = Color3.fromRGB(188, 132, 255),
@@ -304,7 +304,7 @@ local entries: { IdentityPresentation } = {
 	),
 	entry(
 		"Warden",
-		"Archetype",
+		"Class",
 		"Warden",
 		"Placa y retícula. Sostén la Puerta.",
 		"El Warden sostiene la Puerta con placa y retícula: tanque de la Guardia que convierte el cuerpo en cerrojo. Su recurso es esa Guardia, el privilegio de no ceder cuando las corrientes empujan. Ata calor y vacío al escudo con la misma disciplina con que ata el Kyn al acero. Sin un Warden, el nodo se disputa; con él, el umbral tiene peso. Tú no buscas la gloria del primer golpe: buscas que el último no atraviese a los tuyos.",
@@ -314,7 +314,7 @@ local entries: { IdentityPresentation } = {
 	),
 	entry(
 		"Weaver",
-		"Archetype",
+		"Class",
 		"Weaver",
 		"Grieta y resplandor. Doblega el Nodo.",
 		"El Weaver doblega el Nodo: taumaturgo de Foco que teje grieta y resplandor hasta que las escuelas vuelven a hablarse. La Escisión partió el Kyn; el Weaver insiste en volver a trenzarlo, aunque sea un instante. Grieta, meteoro, hielo y retícula no son adornos: son el Continuo forzado a recordar que fue uno. El Poder Astral le sirve de hilo, inestable y suficiente. Tú no lanzas signos contra el mundo: le recuerdas al mundo cómo se curvaba.",
@@ -324,7 +324,7 @@ local entries: { IdentityPresentation } = {
 	),
 	entry(
 		"Stalker",
-		"Archetype",
+		"Class",
 		"Stalker",
 		"Vacío y filo. Caza entre pulsos.",
 		"El Stalker caza entre pulsos, filo de ímpetu que usa el vacío como pasillo. Donde el mundo pierde fidelidad, él ya está al otro lado. Emboscada, látigo y paso hueco convierten la grieta en oficio, no en miedo. Su cuerpo no espera la retícula perfecta: se mueve en el fallo. Tú no persigues a la presa en línea recta; la esperas donde el Continuo parpadea.",
@@ -334,7 +334,7 @@ local entries: { IdentityPresentation } = {
 	),
 	entry(
 		"Luminary",
-		"Archetype",
+		"Class",
 		"Luminary",
 		"Radiancia y retícula. Sana a los heridos.",
 		"El Luminary restaña con Poder Astral, sanador que convierte la corriente radiante y el calor residual en aliento ajeno. No predica un culto importado: trabaja el remanente que la Escisión dejó cuando las escuelas se separaron. Sutura, gracia y guarda son formas de atar el pulso al cuerpo herido antes de que el nodo lo suelte. Sin Luminary, la compañía se desangra entre pérdidas de fidelidad. Tú sostienes a los Guardianes para que el umbral no se quede vacío.",
@@ -344,7 +344,7 @@ local entries: { IdentityPresentation } = {
 	),
 	entry(
 		"Sentinel",
-		"Archetype",
+		"Class",
 		"Sentinel",
 		"Alcance y marca. Fija la caza.",
 		"El Sentinel fija la caza a distancia, tirador de Foco que marca antes de soltar. Su oficio es el alcance: clavar la retícula en un punto y no permitir que el mundo lo desdibuje. Disparo perforante, remate y fuego concentrado convierten la paciencia en filo. Más allá del nodo el yermo pierde fidelidad; el Sentinel apunta como si el Continuo aún tuviera coordenadas. Tú no llenas el cielo de proyectiles: eliges el pulso en el que la presa deja de existir.",
@@ -354,7 +354,7 @@ local entries: { IdentityPresentation } = {
 	),
 	entry(
 		"Hexwright",
-		"Archetype",
+		"Class",
 		"Hexwright",
 		"Sello y podredumbre. Ata el hueco.",
 		"El Hexwright ata el hueco con sello y podredumbre, taumaturgo de Foco que habla las escuelas tóxica, psíquica y de vacío sin pedir permiso. La Escisión no le asusta: le da vocabulario. Sello, veneno y trampa mental convierten el desgarro en contrato. Donde otros ven ruina, el Hexwright ve una corriente que aún puede ligarse a un cuerpo. Tú no sirves al hueco; le pones condiciones.",
@@ -364,7 +364,7 @@ local entries: { IdentityPresentation } = {
 	),
 	entry(
 		"Vanguard",
-		"Archetype",
+		"Class",
 		"Vanguard",
 		"Carga y acero. Rompe la línea.",
 		"El Vanguard rompe la línea, combate cuerpo a cuerpo de Carga que convierte el avance en recurso. No espera a que el enemigo llegue al nodo: lleva el cerrojo hasta su cara. Tajo amplio, martillo y ajuste de cuentas son la misma tesis: el acero también es una escuela, la que nació del sustrato físico cuando el Kyn se partió. Su ímpetu de vanguardia no es descontrol; es inercia dirigida. Tú no sostienes el muro: eres el muro que camina.",
@@ -374,7 +374,7 @@ local entries: { IdentityPresentation } = {
 	),
 	entry(
 		"Tempest",
-		"Archetype",
+		"Class",
 		"Tempest",
 		"Tormenta y sobrecarga. Arca el cielo.",
 		"El Tempest arca el cielo, taumaturgo de sobrecarga que obliga a las corrientes eléctrica, de calor y de frío a hablarse en el mismo relámpago. La sobrecarga no es lujo: es el privilegio de gastar el pulso más rápido de lo que el Nodo recomienda. Tormenta encadenada, glaciar y brasa convierten el clima roto en arma. Tras la Escisión, el cielo dejó de ser techo y se volvió campo de escuelas. Tú no esperas a que escampe: tú eres el frente.",
@@ -384,7 +384,7 @@ local entries: { IdentityPresentation } = {
 	),
 	entry(
 		"Templar",
-		"Archetype",
+		"Class",
 		"Templar",
 		"Égida y veredicto. Sostén lo radiante.",
 		"El Templar es híbrido de Guardia y veredicto: acero que ata la corriente radiante sin soltar el escudo. No es ministro de un altar ajeno; es el oficio de juzgar el campo con lanza solar y placa. La Escisión dejó el resplandor como escuela; el Templar la pone al servicio del umbral, no de un culto. Protege o avanza, pero nunca deja la Guardia atrás. Tú sostienes lo radiante para que otros no tengan que mirar el desgarro desnudos.",
@@ -394,7 +394,7 @@ local entries: { IdentityPresentation } = {
 	),
 	entry(
 		"Arbiter",
-		"Archetype",
+		"Class",
 		"Arbiter",
 		"Arenga y retícula. Juzga el campo.",
 		"El Arbiter juzga el campo, apoyo de Poder Astral que arenga, marca y disipa. Su visión no es trance de templo: es lectura de la retícula en combate, el arte de decir dónde debe ir el pulso. Arenga, marca y recarga convierten a la compañía en un solo nudo. Las ciudades se aferran a nodos; el Arbiter enseña a una escuadra a ser nodo ambulante. Tú no ganas el duelo solo: decides quién todavía puede ganarlo.",
@@ -404,7 +404,7 @@ local entries: { IdentityPresentation } = {
 	),
 	entry(
 		"Dragoon",
-		"Archetype",
+		"Class",
 		"Dragoon",
 		"Salto y lanza. Golpea desde el cielo.",
 		"El Dragoon golpea desde el cielo, combate de ímpetu que convierte salto y lanza en una sola trayectoria. No cabalga bestias prestadas: usa la altura, la grieta y la interceptación para llegar antes de que la retícula del enemigo se cierre. Lanza, paso de grieta y golpe hueco son el mismo descenso. En Kynfall, el cielo pierde fidelidad a tajos; el Dragoon trata cada tajo como rampa. Tú no esperas en la línea: caes sobre ella.",
@@ -414,7 +414,7 @@ local entries: { IdentityPresentation } = {
 	),
 	entry(
 		"Channeler",
-		"Archetype",
+		"Class",
 		"Channeler",
 		"Foco e inundación. Desborda el Nodo.",
 		"El Channeler desborda el Nodo, taumaturgo de Foco que convierte la inundación en doctrina. Donde otros dosifican el Poder Astral, él abre la compuerta y sostiene el caudal hasta que el enemigo o el canal cede. Fuego concentrado, drenaje y tormenta astral son formas de decirle al remanente que deje de ser resto. Es peligroso: el Nodo no fue hecho para un solo pecho. Tú aceptas ese riesgo para que la Escisión, por un instante, vuelva a ser campo único.",
@@ -611,7 +611,7 @@ end
 
 local races = collectKind("Race")
 local origins = collectKind("Origin")
-local archetypes = collectKind("Archetype")
+local classes = collectKind("Class")
 
 local IdentityPresentationCatalog = {}
 
@@ -627,8 +627,8 @@ function IdentityPresentationCatalog.allOrigins(): { IdentityPresentation }
 	return origins
 end
 
-function IdentityPresentationCatalog.allArchetypes(): { IdentityPresentation }
-	return archetypes
+function IdentityPresentationCatalog.allClasses(): { IdentityPresentation }
+	return classes
 end
 
 function IdentityPresentationCatalog.getSpec(id: string): SpecPresentation?
@@ -651,12 +651,12 @@ function IdentityPresentationCatalog.color(colorKey: string): Color3
 	return GOLD
 end
 
-function IdentityPresentationCatalog.powerColor(archetypeId: string): Color3
-	local found = POWER_COLORS[archetypeId]
+function IdentityPresentationCatalog.powerColor(classId: string): Color3
+	local found = POWER_COLORS[classId]
 	if found then
 		return found
 	end
-	local row = IdentityPresentationCatalog.get(archetypeId, "Archetype")
+	local row = IdentityPresentationCatalog.get(classId, "Class")
 	if row ~= nil then
 		return IdentityPresentationCatalog.color(row.ColorKey)
 	end
