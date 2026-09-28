@@ -21,7 +21,7 @@ export type ContentKind =
 	| "LootTable"
 	| "Race"
 	| "Origin"
-	| "Archetype"
+	| "Class"
 	| "Specialization"
 	| "Achievement"
 	| "Collection"
@@ -73,7 +73,7 @@ push("Npc")
 push("LootTable")
 push("Race")
 push("Origin")
-push("Archetype")
+push("Class")
 push("Specialization")
 push("Achievement")
 push("Collection")
@@ -127,7 +127,7 @@ local KIND_CATALOG: { [ContentKind]: string } = {
 	LootTable = "LootTableCatalog",
 	Race = "RaceCatalog",
 	Origin = "OriginCatalog",
-	Archetype = "ArchetypeCatalog",
+	Class = "ClassCatalog",
 	Specialization = "SpecializationCatalog",
 	Achievement = "AchievementCatalog",
 	Collection = "CollectionCatalog",
@@ -192,7 +192,7 @@ local catalogToKind: { [string]: ContentKind } = {
 	LootTableCatalog = "LootTable",
 	RaceCatalog = "Race",
 	OriginCatalog = "Origin",
-	ArchetypeCatalog = "Archetype",
+	ClassCatalog = "Class",
 	SpecializationCatalog = "Specialization",
 	AchievementCatalog = "Achievement",
 	CollectionCatalog = "Collection",
@@ -236,7 +236,7 @@ local kindSet: { [string]: boolean } = {
 	LootTable = true,
 	Race = true,
 	Origin = true,
-	Archetype = true,
+	Class = true,
 	Specialization = true,
 	Achievement = true,
 	Collection = true,
