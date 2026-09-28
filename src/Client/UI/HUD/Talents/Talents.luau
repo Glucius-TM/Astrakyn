@@ -2,7 +2,7 @@
 -- WoW-style talent tree renderer (3 trees, 7 tiers, connector lines).
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ArchetypeTalentCatalog = require(ReplicatedStorage.Definitions.Characters.ArchetypeTalentCatalog)
+local ClassTalentCatalog = require(ReplicatedStorage.Definitions.Characters.ClassTalentCatalog)
 local JsonTypes = require(ReplicatedStorage.Shared.Types.JsonTypes)
 local Paint = require(script:FindFirstAncestor("Client").UI.DesignSystem.Paint)
 local Tabs = require(script.Parent.Parent.Tabs.Tabs)
@@ -23,8 +23,8 @@ local COL_COUNT = 3
 
 local Talents = {}
 
-function Talents.sig(archetypeId: string, treeIndex: number, talents: { string }, points: number): string
-	return `{archetypeId}|{treeIndex}|{table.concat(talents, ",")}|{string.format("%.0f", points)}`
+function Talents.sig(classId: string, treeIndex: number, talents: { string }, points: number): string
+	return `{classId}|{treeIndex}|{table.concat(talents, ",")}|{string.format("%.0f", points)}`
 end
 
 local function treePointsSpent(tree: TalentTreeCatalog.TalentTreeDefinition, known: { [string]: boolean }): number
@@ -50,14 +50,14 @@ end
 
 function Talents.paintTree(
 	canvas: Frame,
-	archetypeId: string,
+	classId: string,
 	treeIndex: number,
 	known: { [string]: boolean },
 	talentPoints: number,
 	deps: TalentPaintDeps
 )
 	Paint.clearFrame(canvas)
-	local trees = TalentTreeCatalog.forArchetype(archetypeId)
+	local trees = TalentTreeCatalog.forClass(classId)
 	local tree = trees[treeIndex]
 	if tree == nil then
 		Paint.text(
@@ -104,7 +104,7 @@ function Talents.paintTree(
 	end
 
 	for _, node in tree.Nodes do
-		local talent = ArchetypeTalentCatalog.get(node.TalentId)
+		local talent = ClassTalentCatalog.get(node.TalentId)
 		if talent == nil then
 			continue
 		end
@@ -207,12 +207,12 @@ function Talents.mount(host: WindowHost.WindowHostApi): WindowHost.PanelHandle
 			end
 			gate.gate(
 				"Talents",
-				Talents.sig(ctx.archetypeId, talentTreeIndex, ctx.talents, ctx.talentPoints),
+				Talents.sig(ctx.classId, talentTreeIndex, ctx.talents, ctx.talentPoints),
 				function()
-					local archLabel = TalentTreeCatalog.archetypeLabel(ctx.archetypeId)
+					local archLabel = TalentTreeCatalog.classLabel(ctx.classId)
 					talentHeader.Text = `{archLabel}   ·   {string.format("%.0f", ctx.talentPoints)} points available`
 					Paint.clearFrame(talentTreeBar)
-					local trees = TalentTreeCatalog.forArchetype(ctx.archetypeId)
+					local trees = TalentTreeCatalog.forClass(ctx.classId)
 					local treeW = 0.99 / math.max(1, #trees)
 					for i, tree in trees do
 						local btn = Paint.tabButton(
@@ -232,7 +232,7 @@ function Talents.mount(host: WindowHost.WindowHostApi): WindowHost.PanelHandle
 					for _, id in ctx.talents do
 						known[id] = true
 					end
-					Talents.paintTree(talentGrid, ctx.archetypeId, talentTreeIndex, known, ctx.talentPoints, {
+					Talents.paintTree(talentGrid, ctx.classId, talentTreeIndex, known, ctx.talentPoints, {
 						tipOn = tipOn,
 						onLearn = function(talentId: string)
 							fire("Character", "LearnTalent", { talentId = talentId })
