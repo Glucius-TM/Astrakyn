@@ -4,7 +4,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local AbilityCatalog = require(ReplicatedStorage.Definitions.Abilities.AbilityCatalog)
 local AffixCatalog = require(ReplicatedStorage.Definitions.Items.AffixCatalog)
-local ArchetypeCatalog = require(ReplicatedStorage.Definitions.Characters.ArchetypeCatalog)
+local ClassCatalog = require(ReplicatedStorage.Definitions.Characters.ClassCatalog)
 local BossCatalog = require(ReplicatedStorage.Definitions.Encounters.BossCatalog)
 local CraftingCatalog = require(ReplicatedStorage.Definitions.Items.CraftingCatalog)
 local EffectCatalog = require(ReplicatedStorage.Definitions.Effects.EffectCatalog)
@@ -80,7 +80,7 @@ function ContentConnectivitySpec.run(Harness: Harness)
 			end
 			acquired[grant.TemplateId] = true
 		end
-		Harness.assert(bag1, `starting loadout equips Bag1: {loadout.ArchetypeId}`)
+		Harness.assert(bag1, `starting loadout equips Bag1: {loadout.ClassId}`)
 	end
 
 	local itemCount = 0
@@ -155,9 +155,9 @@ function ContentConnectivitySpec.run(Harness: Harness)
 	Harness.assert(#ProfessionCatalog.all() >= 5, "profession catalog has live breadth")
 
 	local abilityConsumers: { [string]: boolean } = {}
-	for _, archetype in ArchetypeCatalog.all() do
-		abilityConsumers[archetype.SignatureAbilityId] = true
-		for _, abilityId in archetype.Abilities do
+	for _, class in ClassCatalog.all() do
+		abilityConsumers[class.SignatureAbilityId] = true
+		for _, abilityId in class.Abilities do
 			abilityConsumers[abilityId] = true
 		end
 	end
