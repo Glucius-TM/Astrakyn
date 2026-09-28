@@ -1,8 +1,8 @@
 --!strict
--- WoW-style 3-tree layout per archetype (7 tiers × 3 columns).
+-- WoW-style 3-tree layout per class (7 tiers × 3 columns).
 
-local ArchetypeCatalog = require(script.Parent.ArchetypeCatalog)
-local ArchetypeTalentCatalog = require(script.Parent.ArchetypeTalentCatalog)
+local ClassCatalog = require(script.Parent.ClassCatalog)
+local ClassTalentCatalog = require(script.Parent.ClassTalentCatalog)
 
 export type TalentTreeNode = {
 	TalentId: string,
@@ -42,12 +42,12 @@ end
 
 local cache: { [string]: { TalentTreeDefinition } } = {}
 
-local function buildTrees(archetypeId: string): { TalentTreeDefinition }
-	local names = TREE_NAMES[archetypeId]
+local function buildTrees(classId: string): { TalentTreeDefinition }
+	local names = TREE_NAMES[classId]
 	if names == nil then
 		return {}
 	end
-	local talents = ArchetypeTalentCatalog.forArchetype(archetypeId)
+	local talents = ClassTalentCatalog.forClass(classId)
 	local byTree: { [number]: { TalentTreeNode } } = { [1] = {}, [2] = {}, [3] = {} }
 	for _, talent in talents do
 		table.insert(byTree[talent.TreeIndex], {
@@ -60,7 +60,7 @@ local function buildTrees(archetypeId: string): { TalentTreeDefinition }
 	local trees: { TalentTreeDefinition } = {}
 	for index, name in names do
 		table.insert(trees, {
-			Id = `{archetypeId}_Tree{index}`,
+			Id = `{classId}_Tree{index}`,
 			Name = name,
 			Index = index,
 			Nodes = byTree[index],
@@ -71,16 +71,16 @@ end
 
 local TalentTreeCatalog = {}
 
-function TalentTreeCatalog.forArchetype(archetypeId: string): { TalentTreeDefinition }
-	if cache[archetypeId] == nil then
-		cache[archetypeId] = buildTrees(archetypeId)
+function TalentTreeCatalog.forClass(classId: string): { TalentTreeDefinition }
+	if cache[classId] == nil then
+		cache[classId] = buildTrees(classId)
 	end
-	return cache[archetypeId]
+	return cache[classId]
 end
 
-function TalentTreeCatalog.archetypeLabel(archetypeId: string): string
-	local arch = ArchetypeCatalog.get(archetypeId)
-	return if arch then arch.Name else archetypeId
+function TalentTreeCatalog.classLabel(classId: string): string
+	local arch = ClassCatalog.get(classId)
+	return if arch then arch.Name else classId
 end
 
 return TalentTreeCatalog
