@@ -73,7 +73,7 @@ function CharacterOnboardingSpec.run(Harness: Harness)
 	local seed = ProfileFactory.empty(2, "Onboard")
 	seed.Character.Created = true
 	seed.Character.Id = "c:2:1"
-	seed.Character.ArchetypeId = "Warden"
+	seed.Character.ClassId = "Warden"
 	seed.Character.SpecializationId = "Aegis"
 	seed.Character.Name = "Onboard"
 	local migrated, migrationErr = ProfileMigrator.tryMigrate(seed, 2, "Onboard")
@@ -125,13 +125,13 @@ function CharacterOnboardingSpec.run(Harness: Harness)
 		Harness.assert(hasRaceKey, "raceId key")
 		Harness.assert(not hasOriginKey, "create omits originId")
 		local okMinimal, _ = Schema.hasOnlyKeys({
-			archetypeId = "Warden",
+			classId = "Warden",
 			specializationId = "Aegis",
 			name = "Minimal",
 		}, createRemote.PayloadKeys)
 		Harness.assert(okMinimal, "minimal create payload keys")
 		local okFull, _ = Schema.hasOnlyKeys({
-			archetypeId = "Warden",
+			classId = "Warden",
 			specializationId = "Aegis",
 			name = "Full",
 			raceId = "Emberkin",
