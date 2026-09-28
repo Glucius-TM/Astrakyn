@@ -2,7 +2,7 @@
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ArchetypeCatalog = require(ReplicatedStorage.Definitions.Characters.ArchetypeCatalog)
+local ClassCatalog = require(ReplicatedStorage.Definitions.Characters.ClassCatalog)
 local BuildResolver = require(script.Parent.Parent.Items.BuildResolver)
 local CharacterNameRules = require(ReplicatedStorage.Shared.Utility.CharacterNameRules)
 local ClockService = require(script.Parent.Parent.Parent.Platform.Scheduling.ClockService)
@@ -49,7 +49,7 @@ type CharacterSave = ProfileTypes.CharacterSave
 type RosterRow = {
 	Id: string,
 	Name: string,
-	ArchetypeId: string,
+	ClassId: string,
 	SpecializationId: string,
 	RaceId: string,
 	OriginId: string,
@@ -114,7 +114,7 @@ type CharacterServiceApi = {
 	Create: (
 		self: CharacterServiceApi,
 		player: Player,
-		archetypeId: string,
+		classId: string,
 		specId: string,
 		name: string,
 		raceId: string?
@@ -257,7 +257,7 @@ end
 local function characterId(
 	id: string,
 	created: boolean,
-	archetypeId: string,
+	classId: string,
 	specializationId: string,
 	raceId: string,
 	originId: string,
@@ -267,7 +267,7 @@ local function characterId(
 	return {
 		Id = id,
 		Created = created,
-		ArchetypeId = archetypeId,
+		ClassId = classId,
 		SpecializationId = specializationId,
 		RaceId = raceId,
 		OriginId = originId,
@@ -293,7 +293,7 @@ local function rowFromProfile(profile: PlayerProfile, rowId: string): RosterRow?
 	return {
 		Id = rowId,
 		Name = profile.Character.Name,
-		ArchetypeId = profile.Character.ArchetypeId,
+		ClassId = profile.Character.ClassId,
 		SpecializationId = profile.Character.SpecializationId,
 		RaceId = profile.Character.RaceId,
 		OriginId = profile.Character.OriginId,
@@ -450,7 +450,7 @@ end
 
 function CharacterService:RebuildStats(player: Player)
 	_stats:ClearSource(player, "Level")
-	_stats:ClearSource(player, "Archetype")
+	_stats:ClearSource(player, "Class")
 	_stats:ClearSource(player, "Race")
 	_stats:ClearSource(player, "Origin")
 	local profile = _data:Get(player)
@@ -498,14 +498,14 @@ function CharacterService:RebuildStats(player: Player)
 	if spec then
 		_stats:AddModifier(player, {
 			StatId = spec.StatId,
-			Source = "Archetype",
+			Source = "Class",
 			SourceId = spec.Id,
 			Op = "Add",
 			Value = spec.StatValue,
 			Priority = 12,
 		})
 	end
-	local arch = ArchetypeCatalog.get(profile.Character.ArchetypeId)
+	local arch = ClassCatalog.get(profile.Character.ClassId)
 	local biasId = ""
 	if arch then
 		for index, statId in arch.PrimaryStats do
@@ -515,7 +515,7 @@ function CharacterService:RebuildStats(player: Player)
 			end
 			_stats:AddModifier(player, {
 				StatId = statId,
-				Source = "Archetype",
+				Source = "Class",
 				SourceId = arch.Id .. ":primary",
 				Op = "Add",
 				Value = bonus,
@@ -703,7 +703,7 @@ end
 
 function CharacterService:Create(
 	player: Player,
-	archetypeId: string,
+	classId: string,
 	specId: string,
 	name: string,
 	raceId: string?
@@ -716,12 +716,12 @@ function CharacterService:Create(
 	if existing and existing.Character.Created then
 		return Result.err("character already created")
 	end
-	local arch = ArchetypeCatalog.get(archetypeId)
+	local arch = ClassCatalog.get(classId)
 	if arch == nil then
-		return Result.err("unknown archetype")
+		return Result.err("unknown class")
 	end
 	local spec = SpecializationCatalog.get(specId)
-	if spec == nil or spec.ArchetypeId ~= archetypeId then
+	if spec == nil or spec.ClassId ~= classId then
 		return Result.err("unknown spec")
 	end
 	local resolvedRaceId = RaceCatalog.defaultId()
@@ -748,12 +748,12 @@ function CharacterService:Create(
 	local spawnZoneId = EnterZoneResolver.resolve("", resolvedOriginId)
 	local racialAbilityId = if raceDef then raceDef.RacialAbilityId else ""
 	local originQuestId = `Quest_Origin_{resolvedOriginId}`
-	local archQuestId = `Quest_Arch_{archetypeId}`
-	local seed = StartingMacroCatalog.get(archetypeId)
+	local archQuestId = `Quest_Arch_{classId}`
+	local seed = StartingMacroCatalog.get(classId)
 	_data:Mutate(player, function(profile)
 		local nextId = if profile.Character.Id == "" then Id.guid() else profile.Character.Id
 		profile.Character =
-			characterId(nextId, true, archetypeId, specId, resolvedRaceId, resolvedOriginId, trimmed, "")
+			characterId(nextId, true, classId, specId, resolvedRaceId, resolvedOriginId, trimmed, "")
 		profile.Progression.BindZoneId = spawnZoneId
 		profile.Abilities = IdentityGrantResolver.collectAbilities(
 			arch.Abilities,
@@ -809,7 +809,7 @@ function CharacterService:Create(
 			end
 		end
 	end)
-	local loadout = StartingLoadoutCatalog.get(archetypeId)
+	local loadout = StartingLoadoutCatalog.get(classId)
 	if loadout ~= nil then
 		for _, grant in loadout.Grants do
 			if _inv:CountTemplate(player, grant.TemplateId) == 0 then
