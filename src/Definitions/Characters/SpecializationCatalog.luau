@@ -2,7 +2,7 @@
 
 export type SpecializationDefinition = {
 	Id: string,
-	ArchetypeId: string,
+	ClassId: string,
 	Name: string,
 	ExtraAbilities: { string },
 	StatId: string,
@@ -12,7 +12,7 @@ export type SpecializationDefinition = {
 local specs: { SpecializationDefinition } = {
 	{
 		Id = "Aegis",
-		ArchetypeId = "Warden",
+		ClassId = "Warden",
 		Name = "Aegis",
 		ExtraAbilities = { "Barrier", "ShieldBash", "Fortify", "VoidWard" },
 		StatId = "Armor",
@@ -20,7 +20,7 @@ local specs: { SpecializationDefinition } = {
 	},
 	{
 		Id = "SpecPulse",
-		ArchetypeId = "Warden",
+		ClassId = "Warden",
 		Name = "Pulse",
 		ExtraAbilities = { "Radiance", "Overdrive", "SolarLance", "MarkLattice" },
 		StatId = "AbilityPower",
@@ -28,7 +28,7 @@ local specs: { SpecializationDefinition } = {
 	},
 	{
 		Id = "SpecRift",
-		ArchetypeId = "Weaver",
+		ClassId = "Weaver",
 		Name = "Rift",
 		ExtraAbilities = { "ChronoSpike", "Meteor", "IceNova", "WeaverForm", "LatticeBolt" },
 		StatId = "MasteryRating",
@@ -36,7 +36,7 @@ local specs: { SpecializationDefinition } = {
 	},
 	{
 		Id = "SpecMend",
-		ArchetypeId = "Weaver",
+		ClassId = "Weaver",
 		Name = "Mend",
 		ExtraAbilities = { "BattleMend", "Cleanse", "MassMend", "BattleRevive" },
 		StatId = "HealingPower",
@@ -44,7 +44,7 @@ local specs: { SpecializationDefinition } = {
 	},
 	{
 		Id = "SpecLash",
-		ArchetypeId = "Stalker",
+		ClassId = "Stalker",
 		Name = "Lash",
 		ExtraAbilities = { "Ambush", "ShardFan", "Voidstep", "StalkerForm", "HollowStrike" },
 		StatId = "HasteRating",
@@ -52,7 +52,7 @@ local specs: { SpecializationDefinition } = {
 	},
 	{
 		Id = "SpecExecute",
-		ArchetypeId = "Stalker",
+		ClassId = "Stalker",
 		Name = "Execute",
 		ExtraAbilities = { "Execute", "Bleed", "PiercingShot" },
 		StatId = "CritRating",
@@ -60,7 +60,7 @@ local specs: { SpecializationDefinition } = {
 	},
 	{
 		Id = "LuminaryGrace",
-		ArchetypeId = "Luminary",
+		ClassId = "Luminary",
 		Name = "Grace",
 		ExtraAbilities = { "MassMend", "Tranquil", "HeatSurge", "BattleRevive" },
 		StatId = "HealingPower",
@@ -68,7 +68,7 @@ local specs: { SpecializationDefinition } = {
 	},
 	{
 		Id = "LuminaryWard",
-		ArchetypeId = "Luminary",
+		ClassId = "Luminary",
 		Name = "Ward",
 		ExtraAbilities = { "IceBarrier", "Barrier", "Fortify" },
 		StatId = "Spirit",
@@ -76,7 +76,7 @@ local specs: { SpecializationDefinition } = {
 	},
 	{
 		Id = "SentinelMarksman",
-		ArchetypeId = "Sentinel",
+		ClassId = "Sentinel",
 		Name = "Marksman",
 		ExtraAbilities = { "FinishShot", "PiercingShot", "FocusFire" },
 		StatId = "CritRating",
@@ -84,7 +84,7 @@ local specs: { SpecializationDefinition } = {
 	},
 	{
 		Id = "SentinelSkirmisher",
-		ArchetypeId = "Sentinel",
+		ClassId = "Sentinel",
 		Name = "Skirmisher",
 		ExtraAbilities = { "Withdraw", "Sprint", "CoverDash" },
 		StatId = "HasteRating",
@@ -92,7 +92,7 @@ local specs: { SpecializationDefinition } = {
 	},
 	{
 		Id = "HexwrightPlague",
-		ArchetypeId = "Hexwright",
+		ClassId = "Hexwright",
 		Name = "Plague",
 		ExtraAbilities = { "Bleed", "VenomBurst", "Drain" },
 		StatId = "MasteryRating",
@@ -100,7 +100,7 @@ local specs: { SpecializationDefinition } = {
 	},
 	{
 		Id = "HexwrightPact",
-		ArchetypeId = "Hexwright",
+		ClassId = "Hexwright",
 		Name = "Pact",
 		ExtraAbilities = { "Hex", "VoidSnare", "MindSpike" },
 		StatId = "AbilityPower",
@@ -108,7 +108,7 @@ local specs: { SpecializationDefinition } = {
 	},
 	{
 		Id = "VanguardJuggernaut",
-		ArchetypeId = "Vanguard",
+		ClassId = "Vanguard",
 		Name = "Juggernaut",
 		ExtraAbilities = { "Fortify", "Taunt", "Earthshatter" },
 		StatId = "Armor",
@@ -116,7 +116,7 @@ local specs: { SpecializationDefinition } = {
 	},
 	{
 		Id = "VanguardRavager",
-		ArchetypeId = "Vanguard",
+		ClassId = "Vanguard",
 		Name = "Ravager",
 		ExtraAbilities = { "Reckoning", "Cleave", "Hammerfall" },
 		StatId = "AttackPower",
@@ -124,7 +124,7 @@ local specs: { SpecializationDefinition } = {
 	},
 	{
 		Id = "TempestStorm",
-		ArchetypeId = "Tempest",
+		ClassId = "Tempest",
 		Name = "Storm",
 		ExtraAbilities = { "Stormlash", "ChainArc", "AstralStorm" },
 		StatId = "AbilityPower",
@@ -132,7 +132,7 @@ local specs: { SpecializationDefinition } = {
 	},
 	{
 		Id = "TempestFrostfire",
-		ArchetypeId = "Tempest",
+		ClassId = "Tempest",
 		Name = "Frostfire",
 		ExtraAbilities = { "Glacier", "Emberstorm", "FlameBurst" },
 		StatId = "MasteryRating",
@@ -140,7 +140,7 @@ local specs: { SpecializationDefinition } = {
 	},
 	{
 		Id = "TemplarCrusader",
-		ArchetypeId = "Templar",
+		ClassId = "Templar",
 		Name = "Crusader",
 		ExtraAbilities = { "SolarLance", "Radiance", "ShieldBash" },
 		StatId = "AttackPower",
@@ -148,7 +148,7 @@ local specs: { SpecializationDefinition } = {
 	},
 	{
 		Id = "TemplarProtector",
-		ArchetypeId = "Templar",
+		ClassId = "Templar",
 		Name = "Protector",
 		ExtraAbilities = { "Ward", "Rally", "CoverDash" },
 		StatId = "Armor",
@@ -156,7 +156,7 @@ local specs: { SpecializationDefinition } = {
 	},
 	{
 		Id = "ArbiterHerald",
-		ArchetypeId = "Arbiter",
+		ClassId = "Arbiter",
 		Name = "Herald",
 		ExtraAbilities = { "Rally", "HeatSurge", "MarkLattice" },
 		StatId = "Versatility",
@@ -164,7 +164,7 @@ local specs: { SpecializationDefinition } = {
 	},
 	{
 		Id = "ArbiterOracle",
-		ArchetypeId = "Arbiter",
+		ClassId = "Arbiter",
 		Name = "Oracle",
 		ExtraAbilities = { "HuntMark", "Recharge", "Dispel" },
 		StatId = "Spirit",
@@ -172,7 +172,7 @@ local specs: { SpecializationDefinition } = {
 	},
 	{
 		Id = "DragoonLancer",
-		ArchetypeId = "Dragoon",
+		ClassId = "Dragoon",
 		Name = "Lancer",
 		ExtraAbilities = { "Intercept", "HollowStrike", "RiftStep" },
 		StatId = "AttackPower",
@@ -180,7 +180,7 @@ local specs: { SpecializationDefinition } = {
 	},
 	{
 		Id = "DragoonPhantom",
-		ArchetypeId = "Dragoon",
+		ClassId = "Dragoon",
 		Name = "Phantom",
 		ExtraAbilities = { "Ambush", "Voidstep", "Backstab" },
 		StatId = "HasteRating",
@@ -188,7 +188,7 @@ local specs: { SpecializationDefinition } = {
 	},
 	{
 		Id = "ChannelerConduit",
-		ArchetypeId = "Channeler",
+		ClassId = "Channeler",
 		Name = "Conduit",
 		ExtraAbilities = { "FocusFire", "Drain", "Recharge" },
 		StatId = "Spirit",
@@ -196,7 +196,7 @@ local specs: { SpecializationDefinition } = {
 	},
 	{
 		Id = "ChannelerAnnihilator",
-		ArchetypeId = "Channeler",
+		ClassId = "Channeler",
 		Name = "Annihilator",
 		ExtraAbilities = { "Meteor", "ChronoSpike", "AstralStorm", "AstralBeacon" },
 		StatId = "AbilityPower",
