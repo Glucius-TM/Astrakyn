@@ -18,7 +18,7 @@ local LobbyFacts = {}
 
 function LobbyFacts.rows(slot: RosterSlot): { FactRow }
 	local specName = IdentityPaint.specName(slot.specializationId)
-	local className = IdentityPaint.presentationName(slot.archetypeId, "Archetype")
+	local className = IdentityPaint.presentationName(slot.classId, "Class")
 	local raceName = IdentityPaint.presentationName(slot.raceId, "Race")
 	local originName = IdentityPaint.presentationName(slot.originId, "Origin")
 	local guildLine = if slot.guildName ~= "" then `{slot.guildName}  ·  {slot.guildRank}` else "Sin hermandad"
@@ -122,7 +122,7 @@ function LobbyFacts.paint(detailScroll: ScrollingFrame, slot: RosterSlot?)
 	Paint.divider(detailScroll, UDim2.fromOffset(4, y + 2), UDim2.new(1, -8, 0, 1))
 	local blurb = Paint.text(
 		detailScroll,
-		IdentityPaint.identityBlurb(slot.archetypeId),
+		IdentityPaint.identityBlurb(slot.classId),
 		UDim2.fromOffset(4, y + 10),
 		UDim2.new(1, -8, 0, 72),
 		Enum.TextXAlignment.Left
