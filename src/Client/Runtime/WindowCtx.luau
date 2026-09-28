@@ -110,7 +110,7 @@ function Ctx.build(S: HudState, live: Live): WindowCtx
 		playerName = live.playerName,
 		inspect = S.lastInspect,
 		zoneId = S.lastZoneId,
-		archetypeId = S.lastArchetypeId,
+		classId = S.lastClassId,
 		specializationId = S.lastSpecializationId,
 		raceId = S.lastRaceId,
 		originId = S.lastOriginId,
