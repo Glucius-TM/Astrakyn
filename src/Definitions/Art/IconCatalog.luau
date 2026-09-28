@@ -4,7 +4,7 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local AbilityCatalog = require(ReplicatedStorage.Definitions.Abilities.AbilityCatalog)
-local ArchetypeCatalog = require(ReplicatedStorage.Definitions.Characters.ArchetypeCatalog)
+local ClassCatalog = require(ReplicatedStorage.Definitions.Characters.ClassCatalog)
 local IconAssetRegistry = require(ReplicatedStorage.Definitions.Art.IconAssetRegistry)
 local IconAtlas = require(ReplicatedStorage.Definitions.Art.IconAtlas)
 local IconChrome = require(ReplicatedStorage.Shared.Utility.UI.IconChrome)
@@ -23,16 +23,16 @@ export type IconDescriptor = {
 	accent: Color3,
 }
 
-local function archetypeAccent(archetypeId: string): Color3
-	local row = IdentityPresentationCatalog.get(archetypeId, "Archetype")
+local function classAccent(classId: string): Color3
+	local row = IdentityPresentationCatalog.get(classId, "Class")
 	if row ~= nil then
 		return IdentityPresentationCatalog.color(row.ColorKey)
 	end
 	return Color3.fromRGB(212, 175, 55)
 end
 
-local function isSignatureAbility(abilityId: string, archetypeId: string): boolean
-	local arch = ArchetypeCatalog.get(archetypeId)
+local function isSignatureAbility(abilityId: string, classId: string): boolean
+	local arch = ClassCatalog.get(classId)
 	if arch == nil then
 		return false
 	end
@@ -53,13 +53,13 @@ end
 
 local IconCatalog = {}
 
-function IconCatalog.ability(abilityId: string, archetypeId: string): IconDescriptor
+function IconCatalog.ability(abilityId: string, classId: string): IconDescriptor
 	local def = AbilityCatalog.get(abilityId)
 	local school = if def then def.School else "Energy"
 	local tint = IconChrome.schoolColor(school)
 	local accent = tint
-	if archetypeId ~= "" and isSignatureAbility(abilityId, archetypeId) then
-		accent = archetypeAccent(archetypeId)
+	if classId ~= "" and isSignatureAbility(abilityId, classId) then
+		accent = classAccent(classId)
 		tint = accent:Lerp(tint, 0.35)
 	end
 	local rect = abilityRect(abilityId)
@@ -77,15 +77,15 @@ function IconCatalog.ability(abilityId: string, archetypeId: string): IconDescri
 	}
 end
 
-function IconCatalog.item(templateId: string, quality: string, archetypeId: string): IconDescriptor
+function IconCatalog.item(templateId: string, quality: string, classId: string): IconDescriptor
 	local item = ItemCatalog.get(templateId)
 	local slot = if item then item.Slot else "Material"
 	local tint = if item then IconChrome.qualityColor(item.Quality) else IconChrome.qualityColor(quality)
 	local accent = tint
-	if item and item.PreferredArchetype ~= nil and item.PreferredArchetype ~= "" then
-		accent = archetypeAccent(item.PreferredArchetype)
-	elseif archetypeId ~= "" then
-		accent = archetypeAccent(archetypeId):Lerp(tint, 0.5)
+	if item and item.PreferredClass ~= nil and item.PreferredClass ~= "" then
+		accent = classAccent(item.PreferredClass)
+	elseif classId ~= "" then
+		accent = classAccent(classId):Lerp(tint, 0.5)
 	end
 	local glyph = if item then IconChrome.labelGlyph(item.Name) else IconChrome.slotGlyph(slot)
 	local rect = itemRect(templateId)
