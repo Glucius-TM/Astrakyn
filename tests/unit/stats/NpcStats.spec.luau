@@ -139,7 +139,7 @@ function NpcStatsSpec.run(Harness: Harness)
 	end
 
 	local spawnTable, spawnEntry = SpawnTableCatalog.entry("Unit_Spawn_Threshold_1")
-	Harness.assert(spawnTable ~= nil and spawnEntry ~= nil, "Unit_Spawn_Threshold_1 is a spawn archetype")
+	Harness.assert(spawnTable ~= nil and spawnEntry ~= nil, "Unit_Spawn_Threshold_1 is a spawn class")
 	local thresholdCaster = NpcStatCatalog.snapshot("Unit_Spawn_Threshold_1")
 	Harness.assert(
 		thresholdCaster ~= nil and closeEnough(thresholdCaster.AttackPower, 24, 0.0000001),
