@@ -37,7 +37,7 @@ function Inspect.identityLines(info: UiTypes.InspectInfo): { InspectIdentityLine
 		{ label = "Level", value = string.format("%.0f", info.level) },
 		{
 			label = "Identity",
-			value = IdentityPaint.identityLine(info.raceId, info.originId, info.archetypeId, info.specializationId),
+			value = IdentityPaint.identityLine(info.raceId, info.originId, info.classId, info.specializationId),
 		},
 		{ label = "Racial", value = IdentityPaint.racialName(info.racialAbilityId) },
 		{ label = "Guild", value = if info.guild ~= "" then info.guild else "none" },
@@ -55,7 +55,7 @@ function Inspect.sig(ctx: WindowCtx): string
 		string.format("%.0f", info.level),
 		info.guild,
 		string.format("%.0f", info.mmr),
-		info.archetypeId,
+		info.classId,
 		info.specializationId,
 		info.raceId,
 		info.originId,
@@ -202,8 +202,8 @@ function Inspect.mount(host: WindowHost.WindowHostApi): WindowHost.PanelHandle
 				Paint.clearFrame(inspectStatsScroll)
 				local info = ctx.inspect
 				if info then
-					inspectFace.Text = IdentityPaint.archetypeGlyph(info.archetypeId)
-					inspectFace.TextColor3 = Paint.archetypeColor(info.archetypeId)
+					inspectFace.Text = IdentityPaint.classGlyph(info.classId)
+					inspectFace.TextColor3 = Paint.classColor(info.classId)
 					inspectDollFace.Text = inspectFace.Text
 					inspectDollFace.TextColor3 = inspectFace.TextColor3
 					inspectName.Text = `{info.name}   Lv {string.format("%.0f", info.level)}`
