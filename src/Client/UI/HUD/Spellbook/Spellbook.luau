@@ -3,7 +3,7 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local AbilityCatalog = require(ReplicatedStorage.Definitions.Abilities.AbilityCatalog)
-local ArchetypeCatalog = require(ReplicatedStorage.Definitions.Characters.ArchetypeCatalog)
+local ClassCatalog = require(ReplicatedStorage.Definitions.Characters.ClassCatalog)
 local ExtraPoolCatalog = require(ReplicatedStorage.Definitions.Combat.Stats.ExtraPoolCatalog)
 local GameConstants = require(ReplicatedStorage.Shared.Constants.GameConstants)
 local IconCatalog = require(ReplicatedStorage.Definitions.Art.IconCatalog)
@@ -57,7 +57,7 @@ function Spellbook.categorize(ctx: WindowCtx): SpellbookBuckets
 			specExtra[abilityId] = true
 		end
 	end
-	local arch = ArchetypeCatalog.get(ctx.archetypeId)
+	local arch = ClassCatalog.get(ctx.classId)
 	local kit: { [string]: boolean } = {}
 	if arch then
 		for _, abilityId in arch.Abilities do
@@ -109,13 +109,13 @@ function Spellbook.filtered(ctx: WindowCtx, tab: SpellTabId): { string }
 end
 
 function Spellbook.sig(ctx: WindowCtx, tab: SpellTabId, page: number): string
-	return `{table.concat(ctx.abilities, ",")}|{tab}|{page}|{ctx.archetypeId}|{ctx.specializationId}|{ctx.racialAbilityId}`
+	return `{table.concat(ctx.abilities, ",")}|{tab}|{page}|{ctx.classId}|{ctx.specializationId}|{ctx.racialAbilityId}`
 end
 
-function Spellbook.archetypeTitle(ctx: WindowCtx): string
-	local arch = ArchetypeCatalog.get(ctx.archetypeId)
+function Spellbook.classTitle(ctx: WindowCtx): string
+	local arch = ClassCatalog.get(ctx.classId)
 	local spec = SpecializationCatalog.get(ctx.specializationId)
-	local archName = if arch then arch.Name else ctx.archetypeId
+	local archName = if arch then arch.Name else ctx.classId
 	local specName = if spec then spec.Name else ""
 	if specName ~= "" then
 		return `{archName}  ·  {specName}`
@@ -124,7 +124,7 @@ function Spellbook.archetypeTitle(ctx: WindowCtx): string
 end
 
 export type SpellbookPaintDeps = {
-	archetypeId: string,
+	classId: string,
 	tipOn: (guiObject: GuiObject, text: string, titleColor: Color3?) -> (),
 	onCast: (abilityId: string) -> (),
 	onBind: (abilityId: string) -> (),
@@ -182,7 +182,7 @@ function Spellbook.paintPage(
 		local resource = if def and def.ResourceCost then def.ResourceCost.Resource else "Energy"
 		local costAbbrev = ExtraPoolCatalog.costAbbrev(resource)
 		local resourceLabel = ExtraPoolCatalog.costLabel(resource)
-		local icon = IconCatalog.ability(abilityId, deps.archetypeId)
+		local icon = IconCatalog.ability(abilityId, deps.classId)
 		IconWidgets.paintIconWell(
 			row.Icon,
 			icon.assetId,
@@ -306,7 +306,7 @@ function Spellbook.mount(host: WindowHost.WindowHostApi): WindowHost.PanelHandle
 				return
 			end
 			gate.gate("Spellbook", Spellbook.sig(ctx, spellTab, spellPage), function()
-				spellClassLab.Text = Spellbook.archetypeTitle(ctx)
+				spellClassLab.Text = Spellbook.classTitle(ctx)
 				Paint.clearFrame(spellTabBar)
 				local tabs = Spellbook.tabOrder()
 				local tabW = 0.99 / #tabs
@@ -335,7 +335,7 @@ function Spellbook.mount(host: WindowHost.WindowHostApi): WindowHost.PanelHandle
 				end
 				local filtered = Spellbook.filtered(ctx, spellTab)
 				local pages, clampedPage = Spellbook.paintPage(leftPage, rightPage, filtered, spellPage, {
-					archetypeId = ctx.archetypeId,
+					classId = ctx.classId,
 					tipOn = tipOn,
 					onCast = deps.onUseAbility,
 					onBind = function(id: string)
