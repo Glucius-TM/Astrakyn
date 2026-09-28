@@ -11,7 +11,7 @@ type JsonValue = JsonTypes.JsonValue
 export type RosterSlot = {
 	characterId: string,
 	name: string,
-	archetypeId: string,
+	classId: string,
 	specializationId: string,
 	raceId: string,
 	originId: string,
@@ -67,7 +67,7 @@ function RosterParse.parseSlot(value: JsonValue): RosterSlot?
 	return rosterSlot({
 		characterId = characterId,
 		name = Json.stringOr(row.name, "Kyn"),
-		archetypeId = Json.stringOr(row.archetypeId, ""),
+		classId = Json.stringOr(row.classId, ""),
 		specializationId = Json.stringOr(row.specializationId, ""),
 		raceId = Json.stringOr(row.raceId, ""),
 		originId = Json.stringOr(row.originId, ""),
