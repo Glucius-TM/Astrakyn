@@ -9,7 +9,7 @@ local CATALOG_ROOTS = { "src/Definitions", "src/Shared/Protocols" }
 
 local SKIP_CATALOG_IDS = Common.toSet({
 	"IconCatalog.luau",
-	"ArchetypeTalentCatalog.luau",
+	"ClassTalentCatalog.luau",
 	"TalentTreeCatalog.luau",
 })
 
@@ -38,7 +38,7 @@ local EXTRACTORS: { [string]: { { kind: string, value: string, prefix: string? }
 	["CombatTagCatalog.luau"] = { { kind = "line", value = "^\t([A-Z][A-Za-z0-9]*)%s*=%s*true%s*,?%s*$" } },
 	["AchievementCatalog.luau"] = { { kind = "field", value = "Id" } },
 	["SpecializationCatalog.luau"] = { { kind = "field", value = "Id" } },
-	["ArchetypeCatalog.luau"] = { { kind = "line", value = "^\t([A-Za-z][A-Za-z0-9]*)%s*=%s*{%s*$" } },
+	["ClassCatalog.luau"] = { { kind = "line", value = "^\t([A-Za-z][A-Za-z0-9]*)%s*=%s*{%s*$" } },
 	["MasteryCatalog.luau"] = { { kind = "field", value = "Id" } },
 	["TransformationCatalog.luau"] = { { kind = "field", value = "Id" } },
 	["CosmeticCatalog.luau"] = { { kind = "call", value = "cosmetic" } },
@@ -438,7 +438,7 @@ function Catalogs.collectIssues(): { string }
 
 	for _, name in
 		{
-			"ArchetypeTalentCatalog.luau",
+			"ClassTalentCatalog.luau",
 			"MasteryCatalog.luau",
 			"SetBonusCatalog.luau",
 			"SpecializationCatalog.luau",
@@ -458,7 +458,7 @@ function Catalogs.collectIssues(): { string }
 	local originPath = findCatalog("OriginCatalog.luau")
 	local races = toSet(byName["RaceCatalog.luau"] or {})
 	local origins = toSet(byName["OriginCatalog.luau"] or {})
-	local archetypes = toSet(byName["ArchetypeCatalog.luau"] or {})
+	local classes = toSet(byName["ClassCatalog.luau"] or {})
 	if racePath ~= nil then
 		for _, args in Source.calls(Common.readText(racePath), "race") do
 			if argString(args, 1) ~= nil then
@@ -504,8 +504,8 @@ function Catalogs.collectIssues(): { string }
 				table.insert(hits, `IdentityPresentationCatalog unknown Race '{id}'`)
 			elseif id ~= nil and kind == "Origin" and not origins[id] then
 				table.insert(hits, `IdentityPresentationCatalog unknown Origin '{id}'`)
-			elseif id ~= nil and kind == "Archetype" and not archetypes[id] then
-				table.insert(hits, `IdentityPresentationCatalog unknown Archetype '{id}'`)
+			elseif id ~= nil and kind == "Class" and not classes[id] then
+				table.insert(hits, `IdentityPresentationCatalog unknown Class '{id}'`)
 			end
 		end
 	end
@@ -513,7 +513,7 @@ function Catalogs.collectIssues(): { string }
 	validateFieldRefs(hits, "CollectionCatalog.luau", "TemplateId", items, false, "CollectionCatalog")
 	validateFieldRefs(hits, "DailyQuestCatalog.luau", "ItemId", items, true, "DailyQuestCatalog")
 	validateFieldRefs(hits, "DailyQuestCatalog.luau", "ZoneId", zones, false, "DailyQuestCatalog")
-	validateFieldRefs(hits, "SpecializationCatalog.luau", "ArchetypeId", archetypes, false, "SpecializationCatalog")
+	validateFieldRefs(hits, "SpecializationCatalog.luau", "ClassId", classes, false, "SpecializationCatalog")
 
 	local specializationPath = findCatalog("SpecializationCatalog.luau")
 	if specializationPath ~= nil then
@@ -528,26 +528,26 @@ function Catalogs.collectIssues(): { string }
 	end
 
 	local extraPools = toSet(byName["ExtraPoolCatalog.luau"] or {})
-	local archetypePath = findCatalog("ArchetypeCatalog.luau")
-	if archetypePath ~= nil then
-		local text = Common.readText(archetypePath)
+	local classPath = findCatalog("ClassCatalog.luau")
+	if classPath ~= nil then
+		local text = Common.readText(classPath)
 		for _, block in Source.namedTableBlocks(text, "Abilities") do
 			for _, abilityId in Source.quotedStrings(block) do
 				abilityConsumers[abilityId] = true
 				if not abilities[abilityId] then
-					table.insert(hits, `ArchetypeCatalog unknown ability '{abilityId}'`)
+					table.insert(hits, `ClassCatalog unknown ability '{abilityId}'`)
 				end
 			end
 		end
 		for _, sigId in Source.fieldStrings(text, "SignatureAbilityId") do
 			abilityConsumers[sigId] = true
 			if not abilities[sigId] then
-				table.insert(hits, `ArchetypeCatalog unknown SignatureAbilityId '{sigId}'`)
+				table.insert(hits, `ClassCatalog unknown SignatureAbilityId '{sigId}'`)
 			end
 		end
 		for _, bias in Source.fieldStrings(text, "ResourceBias") do
 			if not extraPools[bias] then
-				table.insert(hits, `ArchetypeCatalog unknown ResourceBias '{bias}'`)
+				table.insert(hits, `ClassCatalog unknown ResourceBias '{bias}'`)
 			end
 		end
 	end
@@ -636,8 +636,8 @@ function Catalogs.collectIssues(): { string }
 		end
 	end
 	for _, loadoutId in ipairs(byName["StartingLoadoutCatalog.luau"] or {}) do
-		if not archetypes[loadoutId] then
-			table.insert(hits, `StartingLoadoutCatalog unknown ArchetypeId '{loadoutId}'`)
+		if not classes[loadoutId] then
+			table.insert(hits, `StartingLoadoutCatalog unknown ClassId '{loadoutId}'`)
 		end
 	end
 	if #(byName["StartingLoadoutCatalog.luau"] or {}) ~= 12 then
@@ -678,10 +678,10 @@ function Catalogs.collectIssues(): { string }
 	local startingMacroPath = findCatalog("StartingMacroCatalog.luau")
 	if startingMacroPath ~= nil then
 		for _, args in Source.calls(Common.readText(startingMacroPath), "seed") do
-			local archetypeId = argString(args, 1)
+			local classId = argString(args, 1)
 			local macroId = argString(args, 2)
-			if archetypeId ~= nil and not archetypes[archetypeId] then
-				table.insert(hits, `StartingMacroCatalog unknown ArchetypeId '{archetypeId}'`)
+			if classId ~= nil and not classes[classId] then
+				table.insert(hits, `StartingMacroCatalog unknown ClassId '{classId}'`)
 			end
 			if macroId ~= nil and not macros[macroId] then
 				table.insert(hits, `StartingMacroCatalog unknown MacroId '{macroId}'`)
@@ -722,7 +722,7 @@ function Catalogs.collectIssues(): { string }
 		end
 	end
 
-	validateFieldRefs(hits, "ItemCatalog.luau", "PreferredArchetype", archetypes, true, "ItemCatalog")
+	validateFieldRefs(hits, "ItemCatalog.luau", "PreferredClass", classes, true, "ItemCatalog")
 	validateFieldRefs(hits, "ItemCatalog.luau", "HomelandZoneId", zones, true, "ItemCatalog")
 
 	return hits
