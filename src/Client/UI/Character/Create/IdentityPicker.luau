@@ -14,14 +14,14 @@ type SpecializationDefinition = SpecializationCatalog.SpecializationDefinition
 export type IdentitySelection = {
 	raceId: string,
 	originId: string,
-	archetypeId: string,
+	classId: string,
 	specializationId: string,
 }
 
 export type IdentityPickerApi = {
 	getSelection: () -> IdentitySelection,
 	selectRace: (raceId: string) -> (),
-	selectArchetype: (archetypeId: string) -> (),
+	selectClass: (classId: string) -> (),
 	selectSpec: (specId: string) -> (),
 }
 
@@ -45,18 +45,18 @@ function IdentityPicker.canonicalOriginId(raceId: string): string
 	return OriginCatalog.defaultId()
 end
 
-function IdentityPicker.specsFor(archetypeId: string): { SpecializationDefinition }
+function IdentityPicker.specsFor(classId: string): { SpecializationDefinition }
 	local specs: { SpecializationDefinition } = {}
 	for _, spec in SpecializationCatalog.all() do
-		if spec.ArchetypeId == archetypeId then
+		if spec.ClassId == classId then
 			table.insert(specs, spec)
 		end
 	end
 	return specs
 end
 
-function IdentityPicker.firstSpecId(archetypeId: string): string
-	local specs = IdentityPicker.specsFor(archetypeId)
+function IdentityPicker.firstSpecId(classId: string): string
+	local specs = IdentityPicker.specsFor(classId)
 	local first = specs[1]
 	if first ~= nil then
 		return first.Id
@@ -66,16 +66,16 @@ end
 
 function IdentityPicker.defaultSelection(): IdentitySelection
 	local races = IdentityPresentationCatalog.allRaces()
-	local archetypes = IdentityPresentationCatalog.allArchetypes()
+	local classes = IdentityPresentationCatalog.allClasses()
 	local raceRow = races[1]
-	local archRow = archetypes[1]
+	local archRow = classes[1]
 	local raceId = if raceRow ~= nil then raceRow.Id else RaceCatalog.defaultId()
-	local archetypeId = if archRow ~= nil then archRow.Id else "Warden"
+	local classId = if archRow ~= nil then archRow.Id else "Warden"
 	return {
 		raceId = raceId,
 		originId = IdentityPicker.canonicalOriginId(raceId),
-		archetypeId = archetypeId,
-		specializationId = IdentityPicker.firstSpecId(archetypeId),
+		classId = classId,
+		specializationId = IdentityPicker.firstSpecId(classId),
 	}
 end
 
@@ -83,17 +83,17 @@ function IdentityPicker.selectRace(current: IdentitySelection, raceId: string): 
 	return {
 		raceId = raceId,
 		originId = IdentityPicker.canonicalOriginId(raceId),
-		archetypeId = current.archetypeId,
+		classId = current.classId,
 		specializationId = current.specializationId,
 	}
 end
 
-function IdentityPicker.selectArchetype(current: IdentitySelection, archetypeId: string): IdentitySelection
+function IdentityPicker.selectClass(current: IdentitySelection, classId: string): IdentitySelection
 	return {
 		raceId = current.raceId,
 		originId = IdentityPicker.canonicalOriginId(current.raceId),
-		archetypeId = archetypeId,
-		specializationId = IdentityPicker.firstSpecId(archetypeId),
+		classId = classId,
+		specializationId = IdentityPicker.firstSpecId(classId),
 	}
 end
 
@@ -101,7 +101,7 @@ function IdentityPicker.selectSpec(current: IdentitySelection, specId: string): 
 	return {
 		raceId = current.raceId,
 		originId = IdentityPicker.canonicalOriginId(current.raceId),
-		archetypeId = current.archetypeId,
+		classId = current.classId,
 		specializationId = specId,
 	}
 end
@@ -192,7 +192,7 @@ function IdentityPicker.mount(parent: Frame, onSelectionChanged: (IdentitySelect
 		selection = {
 			raceId = selection.raceId,
 			originId = originId,
-			archetypeId = selection.archetypeId,
+			classId = selection.classId,
 			specializationId = selection.specializationId,
 		}
 		local row = IdentityPresentationCatalog.get(originId, "Origin")
@@ -250,8 +250,8 @@ function IdentityPicker.mount(parent: Frame, onSelectionChanged: (IdentitySelect
 
 	local function paintArchSelection()
 		for id, btn in archButtons do
-			local chosen = id == selection.archetypeId
-			local archRow = IdentityPresentationCatalog.get(id, "Archetype")
+			local chosen = id == selection.classId
+			local archRow = IdentityPresentationCatalog.get(id, "Class")
 			local tint = if archRow ~= nil then IdentityPresentationCatalog.color(archRow.ColorKey) else Paint.Gold
 			local restText = if chosen then tint else Paint.TextColorButton
 			Paint.setHoverRest(
@@ -266,7 +266,7 @@ function IdentityPicker.mount(parent: Frame, onSelectionChanged: (IdentitySelect
 	end
 
 	local function buildArchCards()
-		for index, row in IdentityPresentationCatalog.allArchetypes() do
+		for index, row in IdentityPresentationCatalog.allClasses() do
 			local tint = IdentityPresentationCatalog.color(row.ColorKey)
 			local btn = Instance.new("TextButton")
 			btn.Name = `Arch_{row.Id}`
@@ -304,7 +304,7 @@ function IdentityPicker.mount(parent: Frame, onSelectionChanged: (IdentitySelect
 			nameLab.TextTruncate = Enum.TextTruncate.AtEnd
 			local captured = row.Id
 			btn.MouseButton1Click:Connect(function()
-				selection = IdentityPicker.selectArchetype(selection, captured)
+				selection = IdentityPicker.selectClass(selection, captured)
 				paintArchSelection()
 				paintSpecs()
 				onSelectionChanged(selection)
@@ -316,7 +316,7 @@ function IdentityPicker.mount(parent: Frame, onSelectionChanged: (IdentitySelect
 
 	paintSpecs = function()
 		Paint.clearFrame(specRow)
-		local specs = IdentityPicker.specsFor(selection.archetypeId)
+		local specs = IdentityPicker.specsFor(selection.classId)
 		for specIndex, spec in specs do
 			if specIndex > 2 then
 				break
@@ -363,8 +363,8 @@ function IdentityPicker.mount(parent: Frame, onSelectionChanged: (IdentitySelect
 		emit()
 	end
 
-	local function selectArchetype(archetypeId: string)
-		selection = IdentityPicker.selectArchetype(selection, firstId(archetypeId, selection.archetypeId))
+	local function selectClass(classId: string)
+		selection = IdentityPicker.selectClass(selection, firstId(classId, selection.classId))
 		emit()
 	end
 
@@ -379,7 +379,7 @@ function IdentityPicker.mount(parent: Frame, onSelectionChanged: (IdentitySelect
 			return selection
 		end,
 		selectRace = selectRace,
-		selectArchetype = selectArchetype,
+		selectClass = selectClass,
 		selectSpec = selectSpec,
 	}
 end
