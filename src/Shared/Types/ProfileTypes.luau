@@ -111,7 +111,7 @@ export type CharacterSave = {
 	Id: string,
 	Character: {
 		Created: boolean,
-		ArchetypeId: string,
+		ClassId: string,
 		SpecializationId: string,
 		RaceId: string,
 		OriginId: string,
@@ -174,7 +174,7 @@ export type PlayerProfile = {
 	Character: {
 		Id: string,
 		Created: boolean,
-		ArchetypeId: string,
+		ClassId: string,
 		SpecializationId: string,
 		RaceId: string,
 		OriginId: string,
