@@ -66,7 +66,7 @@ function ItemTip.format(args: TipArgs): string
 				table.insert(stats, effect.Description)
 			end
 		end
-		local identityHint = IdentityPaint.itemIdentityHint(def.PreferredArchetype, def.HomelandZoneId)
+		local identityHint = IdentityPaint.itemIdentityHint(def.PreferredClass, def.HomelandZoneId)
 		return IconWidgets.itemTipFull(
 			args.name,
 			args.quality,
