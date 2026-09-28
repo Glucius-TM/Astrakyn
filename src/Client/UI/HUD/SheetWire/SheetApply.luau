@@ -97,7 +97,7 @@ function SheetApply.apply(S: HudState, payload: JsonValue, live: Live, hooks: Ho
 	local level = if prog then Json.numberOr(prog.level, 1) else 1
 	live.playerLevel = level
 	live.playerName = Json.stringOr(data.characterName, hooks.displayName)
-	S.lastArchetypeId = Json.stringOr(data.archetypeId, "")
+	S.lastClassId = Json.stringOr(data.classId, "")
 	S.lastSpecializationId = Json.stringOr(data.specializationId, "")
 	S.lastRaceId = Json.stringOr(data.raceId, "")
 	S.lastOriginId = Json.stringOr(data.originId, "")
