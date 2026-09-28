@@ -64,11 +64,11 @@ local function paintCodex(scroll: ScrollingFrame, pick: IdentitySelection)
 	Paint.clearFrame(scroll)
 	local race = IdentityPresentationCatalog.get(pick.raceId, "Race")
 	local origin = IdentityPresentationCatalog.get(pick.originId, "Origin")
-	local archetype = IdentityPresentationCatalog.get(pick.archetypeId, "Archetype")
+	local class = IdentityPresentationCatalog.get(pick.classId, "Class")
 	local spec = IdentityPresentationCatalog.getSpec(pick.specializationId)
 	local raceLore = IdentityPresentationCatalog.lore(pick.raceId, "Race")
 	local originLore = IdentityPresentationCatalog.lore(pick.originId, "Origin")
-	local archetypeLore = IdentityPresentationCatalog.lore(pick.archetypeId, "Archetype")
+	local classLore = IdentityPresentationCatalog.lore(pick.classId, "Class")
 
 	local sections: { { header: string, name: string, blurb: string, lore: string } } = {
 		{
@@ -85,9 +85,9 @@ local function paintCodex(scroll: ScrollingFrame, pick: IdentitySelection)
 		},
 		{
 			header = "Clase",
-			name = if archetype ~= nil then archetype.DisplayName else "—",
-			blurb = if archetype ~= nil then archetype.Blurb else "—",
-			lore = if archetype ~= nil then dashOr(archetypeLore) else "—",
+			name = if class ~= nil then class.DisplayName else "—",
+			blurb = if class ~= nil then class.Blurb else "—",
+			lore = if class ~= nil then dashOr(classLore) else "—",
 		},
 		{
 			header = "Especialización",
@@ -331,7 +331,7 @@ function CreateScreen.open(onCreated: () -> (), onCancel: (() -> ())?): CreateSc
 		identityLine.Text = IdentityPaint.identityLine(
 			nextSelection.raceId,
 			nextSelection.originId,
-			nextSelection.archetypeId,
+			nextSelection.classId,
 			nextSelection.specializationId
 		)
 		paintCodex(codexScroll, nextSelection)
@@ -389,7 +389,7 @@ function CreateScreen.open(onCreated: () -> (), onCancel: (() -> ())?): CreateSc
 		confirmCreate.Text = "Creando…"
 		local pick = identityPicker.getSelection()
 		ClientRemotes.get("Character", "CreateCharacter"):FireServer({
-			archetypeId = pick.archetypeId,
+			classId = pick.classId,
 			specializationId = pick.specializationId,
 			name = nameBox.Text,
 			raceId = pick.raceId,
