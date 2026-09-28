@@ -310,7 +310,7 @@ function SocialHandlers.register(ctx: Context)
 			level = if profile then profile.Progression.Level else 1,
 			guild = GuildService:NameOf(other),
 			mmr = PvPService:MMR(other),
-			archetypeId = if profile then profile.Character.ArchetypeId else "",
+			classId = if profile then profile.Character.ClassId else "",
 			specializationId = if profile then profile.Character.SpecializationId else "",
 			raceId = if profile then profile.Character.RaceId else "",
 			originId = if profile then profile.Character.OriginId else "",
