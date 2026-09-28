@@ -1,7 +1,7 @@
 --!strict
 
 export type CharacterBuild = {
-	ArchetypeId: string,
+	ClassId: string,
 	SpecializationId: string,
 	RaceId: string,
 	OriginId: string,
