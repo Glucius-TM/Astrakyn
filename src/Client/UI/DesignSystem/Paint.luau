@@ -315,8 +315,8 @@ function Paint.schoolColor(school: string): Color3
 	return IconChrome.schoolColor(school)
 end
 
-function Paint.archetypeColor(archetypeId: string): Color3
-	local row = IdentityPresentationCatalog.get(archetypeId, "Archetype")
+function Paint.classColor(classId: string): Color3
+	local row = IdentityPresentationCatalog.get(classId, "Class")
 	if row ~= nil then
 		return IdentityPresentationCatalog.color(row.ColorKey)
 	end
@@ -1210,8 +1210,8 @@ function Paint.applyScale(gui: LayerCollector, scale: number)
 	uiScale.Parent = gui
 end
 
-function Paint.powerColor(archetypeId: string): Color3
-	return IdentityPresentationCatalog.powerColor(archetypeId)
+function Paint.powerColor(classId: string): Color3
+	return IdentityPresentationCatalog.powerColor(classId)
 end
 
 function Paint.classificationColor(kind: string): Color3
