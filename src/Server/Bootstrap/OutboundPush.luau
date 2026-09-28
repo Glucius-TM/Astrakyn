@@ -11,7 +11,7 @@ type App = ServiceRegistry.App
 export type RosterSlotRow = {
 	characterId: string,
 	name: string,
-	archetypeId: string,
+	classId: string,
 	specializationId: string,
 	raceId: string,
 	originId: string,
@@ -86,7 +86,7 @@ function OutboundPush.create(app: App): {
 			table.insert(slots, {
 				characterId = row.Id,
 				name = row.Name,
-				archetypeId = row.ArchetypeId,
+				classId = row.ClassId,
 				specializationId = row.SpecializationId,
 				raceId = row.RaceId,
 				originId = row.OriginId,
