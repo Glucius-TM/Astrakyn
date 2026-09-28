@@ -1,7 +1,7 @@
 --!strict
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ArchetypeTalentCatalog = require(ReplicatedStorage.Definitions.Characters.ArchetypeTalentCatalog)
+local ClassTalentCatalog = require(ReplicatedStorage.Definitions.Characters.ClassTalentCatalog)
 local ContainerTypes = require(ReplicatedStorage.Shared.Types.ServiceContainerTypes)
 local DataService = require(script.Parent.Parent.Parent.Platform.Persistence.DataService)
 local GameConstants = require(ReplicatedStorage.Shared.Constants.GameConstants)
@@ -20,7 +20,7 @@ end
 function TalentService:Start() end
 
 function TalentService:Learn(player: Player, talentId: string): Result.Result<boolean>
-	local talent = ArchetypeTalentCatalog.get(talentId)
+	local talent = ClassTalentCatalog.get(talentId)
 	if talent == nil then
 		return Result.err("unknown talent")
 	end
@@ -28,7 +28,7 @@ function TalentService:Learn(player: Player, talentId: string): Result.Result<bo
 	if profile == nil then
 		return Result.err("no profile")
 	end
-	if profile.Character.ArchetypeId ~= talent.ArchetypeId then
+	if profile.Character.ClassId ~= talent.ClassId then
 		return Result.err("wrong class")
 	end
 	if profile.Progression.TalentPoints < 1 then
@@ -83,7 +83,7 @@ function TalentService:Rebuild(player: Player)
 		return
 	end
 	for _, talentId in profile.Talents do
-		local talent = ArchetypeTalentCatalog.get(talentId)
+		local talent = ClassTalentCatalog.get(talentId)
 		if talent then
 			_stats:AddModifier(player, {
 				StatId = talent.StatId,
