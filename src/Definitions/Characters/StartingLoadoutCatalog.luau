@@ -1,14 +1,14 @@
 --!strict
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ArchetypeCatalog = require(ReplicatedStorage.Definitions.Characters.ArchetypeCatalog)
+local ClassCatalog = require(ReplicatedStorage.Definitions.Characters.ClassCatalog)
 local ItemCatalog = require(ReplicatedStorage.Definitions.Items.ItemCatalog)
 local ItemTypes = require(ReplicatedStorage.Shared.Types.ItemTypes)
 
 type EquipmentSlot = ItemTypes.EquipmentSlot
 
 export type StartingGrant = { TemplateId: string, Equip: boolean, SlotOverride: EquipmentSlot? }
-export type StartingLoadout = { ArchetypeId: string, Grants: { StartingGrant } }
+export type StartingLoadout = { ClassId: string, Grants: { StartingGrant } }
 
 local function grant(templateId: string, equip: boolean, slotOverride: EquipmentSlot?): StartingGrant
 	if ItemCatalog.get(templateId) == nil then
@@ -17,11 +17,11 @@ local function grant(templateId: string, equip: boolean, slotOverride: Equipment
 	return { TemplateId = templateId, Equip = equip, SlotOverride = slotOverride }
 end
 
-local function loadout(archetypeId: string, grants: { StartingGrant }): StartingLoadout
-	if ArchetypeCatalog.get(archetypeId) == nil then
-		error(`StartingLoadoutCatalog unknown ArchetypeId {archetypeId}`)
+local function loadout(classId: string, grants: { StartingGrant }): StartingLoadout
+	if ClassCatalog.get(classId) == nil then
+		error(`StartingLoadoutCatalog unknown ClassId {classId}`)
 	end
-	return { ArchetypeId = archetypeId, Grants = grants }
+	return { ClassId = classId, Grants = grants }
 end
 
 local rows: { StartingLoadout } = {
@@ -46,16 +46,16 @@ local rows: { StartingLoadout } = {
 
 local byId: { [string]: StartingLoadout } = {}
 for _, row in rows do
-	if byId[row.ArchetypeId] ~= nil then
-		error(`duplicate starting loadout {row.ArchetypeId}`)
+	if byId[row.ClassId] ~= nil then
+		error(`duplicate starting loadout {row.ClassId}`)
 	end
-	byId[row.ArchetypeId] = row
+	byId[row.ClassId] = row
 end
 
 local StartingLoadoutCatalog = {}
 
-function StartingLoadoutCatalog.get(archetypeId: string): StartingLoadout?
-	return byId[archetypeId]
+function StartingLoadoutCatalog.get(classId: string): StartingLoadout?
+	return byId[classId]
 end
 
 function StartingLoadoutCatalog.count(): number
