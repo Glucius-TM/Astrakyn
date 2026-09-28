@@ -25,7 +25,7 @@ function CharacterRosterSpec.run(Harness: Harness)
 	local profile = ProfileFactory.empty(9, "AltHero")
 	profile.Character.Created = true
 	profile.Character.Name = "AltHero"
-	profile.Character.ArchetypeId = "Warden"
+	profile.Character.ClassId = "Warden"
 	profile.Character.SpecializationId = "Aegis"
 	profile.Character.Id = "c:9:live"
 	profile.Progression.Level = 12
@@ -76,7 +76,7 @@ function CharacterRosterSpec.run(Harness: Harness)
 	local seed = ProfileFactory.empty(4, "Roster")
 	seed.Character.Created = true
 	seed.Character.Id = "c:4:1"
-	seed.Character.ArchetypeId = "Warden"
+	seed.Character.ClassId = "Warden"
 	seed.Character.SpecializationId = "Aegis"
 	seed.Character.Name = "Roster"
 	local migrated, migrationErr = ProfileMigrator.tryMigrate(seed, 4, "Roster")
