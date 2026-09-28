@@ -37,7 +37,7 @@ function Sheet.charSig(ctx: WindowCtx): string
 		string.format("%.0f", ctx.playerAbsorb),
 		string.format("%.0f", ctx.level),
 		ctx.title,
-		ctx.archetypeId,
+		ctx.classId,
 		ctx.specializationId,
 		ctx.raceId,
 		ctx.originId,
@@ -219,7 +219,7 @@ function Sheet.mount(host: WindowHost.WindowHostApi): WindowHost.PanelHandle
 	local function paintItemIconBtn(btn: TextButton, ctx: WindowCtx, templateId: string, quality: string, slot: string)
 		local well = IconWidgets.mountItemSlotIcon(btn)
 		if templateId ~= "" then
-			local icon = IconCatalog.item(templateId, quality, ctx.archetypeId)
+			local icon = IconCatalog.item(templateId, quality, ctx.classId)
 			IconWidgets.paintIconWell(
 				well,
 				icon.assetId,
@@ -379,12 +379,12 @@ function Sheet.mount(host: WindowHost.WindowHostApi): WindowHost.PanelHandle
 			Tabs.syncTab(sheetTabs, host.getSheetTab() :: Tabs.TabId)
 			gate.gate("Character", Sheet.charSig(ctx), function()
 				character.Title.Text = `Character — {ctx.playerName}`
-				charPortrait.Text = IdentityPaint.archetypeGlyph(ctx.archetypeId)
-				charPortrait.TextColor3 = Paint.archetypeColor(ctx.archetypeId)
+				charPortrait.Text = IdentityPaint.classGlyph(ctx.classId)
+				charPortrait.TextColor3 = Paint.classColor(ctx.classId)
 				Paint.setFill(charVitals, ctx.hp / math.max(1, ctx.maxHp))
 				Paint.setMeterText(charVitals, `{string.format("%.0f", ctx.hp)} / {string.format("%.0f", ctx.maxHp)}`)
 				Paint.setAbsorb(charVitals, ctx.hp / math.max(1, ctx.maxHp), ctx.playerAbsorb / math.max(1, ctx.maxHp))
-				Paint.setFillColor(charPower, Paint.powerColor(ctx.archetypeId))
+				Paint.setFillColor(charPower, Paint.powerColor(ctx.classId))
 				Paint.setFill(charPower, ctx.energy / math.max(1, ctx.maxEnergy))
 				Paint.setMeterText(
 					charPower,
@@ -420,7 +420,7 @@ function Sheet.mount(host: WindowHost.WindowHostApi): WindowHost.PanelHandle
 					else "Unproven"}\n{IdentityPaint.identityLine(
 					ctx.raceId,
 					ctx.originId,
-					ctx.archetypeId,
+					ctx.classId,
 					ctx.specializationId
 				)}{if ctx.racialAbilityId ~= ""
 					then `   ·   {IdentityPaint.racialName(ctx.racialAbilityId)}`
