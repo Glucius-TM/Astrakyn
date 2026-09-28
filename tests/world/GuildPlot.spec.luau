@@ -87,7 +87,7 @@ function GuildPlotSpec.run(Harness: Harness)
 
 	local profile = ProfileFactory.empty(99, "PlotCaptain")
 	profile.Character.Created = true
-	profile.Character.ArchetypeId = "Warden"
+	profile.Character.ClassId = "Warden"
 	profile.Character.SpecializationId = "Aegis"
 	profile.Loadouts = {
 		{
