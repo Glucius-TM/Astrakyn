@@ -20,7 +20,7 @@ type CharacterSave = ProfileTypes.CharacterSave
 
 type CharacterAppearance = {
 	Created: boolean,
-	ArchetypeId: string,
+	ClassId: string,
 	SpecializationId: string,
 	RaceId: string,
 	OriginId: string,
@@ -205,7 +205,7 @@ end
 
 local function appearanceFrom(
 	created: boolean,
-	archetypeId: string,
+	classId: string,
 	specializationId: string,
 	raceId: string,
 	originId: string,
@@ -214,7 +214,7 @@ local function appearanceFrom(
 ): CharacterAppearance
 	return {
 		Created = created,
-		ArchetypeId = archetypeId,
+		ClassId = classId,
 		SpecializationId = specializationId,
 		RaceId = raceId,
 		OriginId = originId,
@@ -228,7 +228,7 @@ local function characterSave(id: string, profile: PlayerProfile): CharacterSave
 		Id = id,
 		Character = appearanceFrom(
 			profile.Character.Created,
-			profile.Character.ArchetypeId,
+			profile.Character.ClassId,
 			profile.Character.SpecializationId,
 			profile.Character.RaceId,
 			profile.Character.OriginId,
@@ -339,7 +339,7 @@ function ProfileFactory.empty(userId: number, displayName: string): PlayerProfil
 		Character = {
 			Id = "",
 			Created = false,
-			ArchetypeId = "",
+			ClassId = "",
 			SpecializationId = "",
 			RaceId = "Astralborn",
 			OriginId = "Threshold",
@@ -408,7 +408,7 @@ end
 function ProfileFactory.apply(profile: PlayerProfile, save: CharacterSave)
 	local appearance = appearanceFrom(
 		save.Character.Created,
-		save.Character.ArchetypeId,
+		save.Character.ClassId,
 		save.Character.SpecializationId,
 		save.Character.RaceId,
 		save.Character.OriginId,
@@ -417,7 +417,7 @@ function ProfileFactory.apply(profile: PlayerProfile, save: CharacterSave)
 	)
 	profile.Character.Id = save.Id
 	profile.Character.Created = appearance.Created
-	profile.Character.ArchetypeId = appearance.ArchetypeId
+	profile.Character.ClassId = appearance.ClassId
 	profile.Character.SpecializationId = appearance.SpecializationId
 	profile.Character.RaceId = appearance.RaceId
 	profile.Character.OriginId = appearance.OriginId
