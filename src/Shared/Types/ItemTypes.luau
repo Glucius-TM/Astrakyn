@@ -95,7 +95,7 @@ export type ItemTemplate = {
 	RequiredLevel: number,
 	AllowDualWield: boolean,
 	TrinketEffectId: string,
-	PreferredArchetype: string?,
+	PreferredClass: string?,
 	HomelandZoneId: string?,
 	BagSlotsMin: number,
 	BagFamily: BagFamily,
