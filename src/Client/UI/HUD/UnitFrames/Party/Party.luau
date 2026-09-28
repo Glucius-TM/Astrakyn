@@ -36,7 +36,7 @@ function Party.partySig(rows: { PartyRow }, localUserId: number): string
 			)}:{string.format("%.0f", member.maxHp)}:{string.format("%.0f", member.energy)}:{string.format(
 				"%.0f",
 				member.maxEnergy
-			)}:{member.raceId}:{member.originId}:{member.archetypeId}:{member.specializationId}:{member.racialAbilityId}:{ExtraPools.sig(
+			)}:{member.raceId}:{member.originId}:{member.classId}:{member.specializationId}:{member.racialAbilityId}:{ExtraPools.sig(
 				member.extraPools
 			)}`
 		)
@@ -130,7 +130,7 @@ function Party.mount(root: Frame, deps: UnitFramesDeps, shared: ChromeShared): P
 			frame.PowerText.Text = string.format("%.0f", member.energy)
 			frame.PortraitText.Text = string.sub(member.name, 1, 1)
 			local identity =
-				IdentityPaint.identityLine(member.raceId, member.originId, member.archetypeId, member.specializationId)
+				IdentityPaint.identityLine(member.raceId, member.originId, member.classId, member.specializationId)
 			frame.Class.Text = if identity ~= "" then identity elseif member.leader then "Leader" else "Party"
 			frame.Class.TextTruncate = Enum.TextTruncate.AtEnd
 			frame.Pvp.Text = ""
