@@ -399,18 +399,18 @@ local function testIdentityPicker(Harness: Harness)
 	local defSel = IdentityPicker.defaultSelection()
 	Harness.assertEqual(defSel.raceId, "Astralborn", "picker default race")
 	Harness.assertEqual(defSel.originId, "Threshold", "picker default canonical origin")
-	Harness.assertEqual(defSel.archetypeId, "Warden", "picker default archetype")
+	Harness.assertEqual(defSel.classId, "Warden", "picker default class")
 	Harness.assertEqual(defSel.specializationId, "Aegis", "picker default first spec")
 	Harness.assertEqual(#IdentityPicker.specsFor("Warden"), 2, "picker two Warden specs")
 	Harness.assertEqual(#IdentityPicker.specsFor("Luminary"), 2, "picker two Luminary specs")
 	local emberPick = IdentityPicker.selectRace(defSel, "Emberkin")
 	Harness.assertEqual(emberPick.originId, "Emberwatch", "race selects CanonicalOriginId")
-	local weaverPick = IdentityPicker.selectArchetype(defSel, "Weaver")
-	Harness.assertEqual(weaverPick.specializationId, "SpecRift", "archetype selects first spec")
-	local archetypes = IdentityPresentationCatalog.allArchetypes()
-	Harness.assertEqual(#archetypes, 12, "twelve archetypes one list")
-	Harness.assertEqual(archetypes[1].Id, "Warden", "list starts Warden")
-	Harness.assertEqual(archetypes[12].Id, "Channeler", "list ends Channeler")
+	local weaverPick = IdentityPicker.selectClass(defSel, "Weaver")
+	Harness.assertEqual(weaverPick.specializationId, "SpecRift", "class selects first spec")
+	local classes = IdentityPresentationCatalog.allClasses()
+	Harness.assertEqual(#classes, 12, "twelve classes one list")
+	Harness.assertEqual(classes[1].Id, "Warden", "list starts Warden")
+	Harness.assertEqual(classes[12].Id, "Channeler", "list ends Channeler")
 	local pickerFired = 0
 	local lastPick: IdentityPicker.IdentitySelection? = nil
 	local pickerHost = Instance.new("Frame")
@@ -457,10 +457,10 @@ local function testIdentityPicker(Harness: Harness)
 	Harness.assert(pickerHost:FindFirstChild("Spec_Aegis", true) ~= nil, "filtered spec Aegis")
 	pickerApi.selectRace("Tideborn")
 	Harness.assert(lastPick ~= nil and lastPick.originId == "Tidehaven", "mount race selects canonical origin")
-	pickerApi.selectArchetype("Channeler")
-	Harness.assert(lastPick ~= nil and lastPick.archetypeId == "Channeler", "mount archetype selection")
+	pickerApi.selectClass("Channeler")
+	Harness.assert(lastPick ~= nil and lastPick.classId == "Channeler", "mount class selection")
 	Harness.assertEqual(
-		#IdentityPicker.specsFor(pickerApi.getSelection().archetypeId),
+		#IdentityPicker.specsFor(pickerApi.getSelection().classId),
 		2,
 		"selected arch has two specs"
 	)
@@ -542,7 +542,7 @@ function ChromeSpec.run(Harness: Harness)
 	Harness.assertEqual(Paint.zoneTint("PvP"), Color3.fromRGB(72, 22, 18), "pvp zone tint")
 	Harness.assertEqual(Paint.channelColor("Guild"), Color3.fromRGB(64, 255, 64), "guild chat color")
 	Harness.assertEqual(Paint.channelColor("Combat"), Color3.fromRGB(255, 168, 96), "combat chat color")
-	Harness.assertEqual(Paint.archetypeColor("Warden"), Color3.fromRGB(72, 128, 196), "warden color")
+	Harness.assertEqual(Paint.classColor("Warden"), Color3.fromRGB(72, 128, 196), "warden color")
 	Harness.assertEqual(Paint.formatDuration(90), "1m", "duration minutes")
 	Harness.assertEqual(Paint.formatDuration(4), "4", "duration seconds")
 	Harness.assertEqual(Paint.formatDuration(0.8), "0.8", "duration subsecond")
@@ -578,7 +578,7 @@ function ChromeSpec.run(Harness: Harness)
 	Harness.assert(string.find(setTip, "2/6", 1, true) ~= nil, "set bonus tip 2/6")
 	Harness.assert(string.find(setTip, "●2", 1, true) ~= nil, "set bonus tip met 2")
 	Harness.assert(string.find(setTip, "○4", 1, true) ~= nil, "set bonus tip unmet 4")
-	Harness.assertEqual(IdentityPaint.archetypeGlyph("Weaver"), "Λ", "weaver glyph")
+	Harness.assertEqual(IdentityPaint.classGlyph("Weaver"), "Λ", "weaver glyph")
 	local combatLine = SystemHints.combatLogLine("Pulse", 42, "Echo", true, "hit")
 	Harness.assert(string.find(combatLine, "Pulse", 1, true) ~= nil, "combat log ability")
 	Harness.assert(string.find(combatLine, "Critical", 1, true) ~= nil, "combat log crit")
@@ -744,7 +744,7 @@ function ChromeSpec.run(Harness: Harness)
 			playerName = "Test",
 			inspect = nil,
 			zoneId = "Zone_Threshold",
-			archetypeId = "Warden",
+			classId = "Warden",
 			specializationId = "Guardian",
 			raceId = "Astralborn",
 			originId = "Threshold",
@@ -927,7 +927,7 @@ function ChromeSpec.run(Harness: Harness)
 			extraPools = {},
 			raceId = "",
 			originId = "",
-			archetypeId = "",
+			classId = "",
 			specializationId = "",
 			racialAbilityId = "",
 		},
@@ -953,7 +953,7 @@ function ChromeSpec.run(Harness: Harness)
 			extraPools = {},
 			raceId = "",
 			originId = "",
-			archetypeId = "",
+			classId = "",
 			specializationId = "",
 			racialAbilityId = "",
 		},
@@ -1051,7 +1051,7 @@ function ChromeSpec.run(Harness: Harness)
 		level = 8,
 		guild = "Kyn",
 		mmr = 1200,
-		archetypeId = "Warden",
+		classId = "Warden",
 		specializationId = "Guardian",
 		raceId = "Astralborn",
 		originId = "Threshold",
@@ -1069,7 +1069,7 @@ function ChromeSpec.run(Harness: Harness)
 		level = 8,
 		guild = "Kyn",
 		mmr = 1200,
-		archetypeId = "Warden",
+		classId = "Warden",
 		specializationId = "Guardian",
 		raceId = "Astralborn",
 		originId = "Threshold",
@@ -1087,7 +1087,7 @@ function ChromeSpec.run(Harness: Harness)
 		level = 8,
 		guild = "Kyn",
 		mmr = 1200,
-		archetypeId = "Warden",
+		classId = "Warden",
 		specializationId = "Guardian",
 		raceId = "Astralborn",
 		originId = "Threshold",
@@ -1128,7 +1128,7 @@ function ChromeSpec.run(Harness: Harness)
 		level = 8,
 		guild = "Kyn",
 		mmr = 1200,
-		archetypeId = "Warden",
+		classId = "Warden",
 		specializationId = "Guardian",
 		raceId = "Astralborn",
 		originId = "Threshold",
@@ -1461,7 +1461,7 @@ function ChromeSpec.run(Harness: Harness)
 		maxEnergy = 50,
 		absorb = 5,
 		combo = 2,
-		archetypeId = "Warden",
+		classId = "Warden",
 		specializationId = "Bastion",
 		raceId = "Astralborn",
 		originId = "Threshold",
@@ -1480,7 +1480,7 @@ function ChromeSpec.run(Harness: Harness)
 		maxEnergy = playerBase.maxEnergy,
 		absorb = playerBase.absorb,
 		combo = playerBase.combo,
-		archetypeId = playerBase.archetypeId,
+		classId = playerBase.classId,
 		specializationId = playerBase.specializationId,
 		raceId = playerBase.raceId,
 		originId = playerBase.originId,
@@ -1499,7 +1499,7 @@ function ChromeSpec.run(Harness: Harness)
 		maxEnergy = playerBase.maxEnergy,
 		absorb = playerBase.absorb,
 		combo = 5,
-		archetypeId = playerBase.archetypeId,
+		classId = playerBase.classId,
 		specializationId = playerBase.specializationId,
 		raceId = playerBase.raceId,
 		originId = playerBase.originId,
@@ -1518,7 +1518,7 @@ function ChromeSpec.run(Harness: Harness)
 		maxEnergy = playerBase.maxEnergy,
 		absorb = playerBase.absorb,
 		combo = playerBase.combo,
-		archetypeId = playerBase.archetypeId,
+		classId = playerBase.classId,
 		specializationId = playerBase.specializationId,
 		raceId = playerBase.raceId,
 		originId = playerBase.originId,
@@ -1537,7 +1537,7 @@ function ChromeSpec.run(Harness: Harness)
 		maxEnergy = playerBase.maxEnergy,
 		absorb = playerBase.absorb,
 		combo = playerBase.combo,
-		archetypeId = playerBase.archetypeId,
+		classId = playerBase.classId,
 		specializationId = playerBase.specializationId,
 		raceId = playerBase.raceId,
 		originId = playerBase.originId,
@@ -1586,7 +1586,7 @@ function ChromeSpec.run(Harness: Harness)
 			extraPools = {},
 			raceId = "Astralborn",
 			originId = "Threshold",
-			archetypeId = "Warden",
+			classId = "Warden",
 			specializationId = "Aegis",
 			racialAbilityId = "AstralStep",
 		},
@@ -1601,7 +1601,7 @@ function ChromeSpec.run(Harness: Harness)
 			extraPools = {},
 			raceId = "Emberkin",
 			originId = "Emberwatch",
-			archetypeId = "Weaver",
+			classId = "Weaver",
 			specializationId = "SpecRift",
 			racialAbilityId = "EmberBlood",
 		},
@@ -1620,7 +1620,7 @@ function ChromeSpec.run(Harness: Harness)
 			extraPools = {},
 			raceId = "Emberkin",
 			originId = "Emberwatch",
-			archetypeId = "Weaver",
+			classId = "Weaver",
 			specializationId = "SpecRift",
 			racialAbilityId = "EmberBlood",
 		},
