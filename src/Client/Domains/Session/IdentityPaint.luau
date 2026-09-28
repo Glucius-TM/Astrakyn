@@ -10,15 +10,15 @@ type IdentityKind = IdentityPresentationCatalog.IdentityKind
 
 local IdentityPaint = {}
 
-function IdentityPaint.archetypeGlyph(archetypeId: string): string
-	local row = IdentityPresentationCatalog.get(archetypeId, "Archetype")
+function IdentityPaint.classGlyph(classId: string): string
+	local row = IdentityPresentationCatalog.get(classId, "Class")
 	if row ~= nil then
 		return row.Glyph
 	end
-	if archetypeId == "" then
+	if classId == "" then
 		return "?"
 	end
-	return string.upper(string.sub(archetypeId, 1, 1))
+	return string.upper(string.sub(classId, 1, 1))
 end
 
 function IdentityPaint.raceGlyph(raceId: string): string
@@ -76,10 +76,10 @@ function IdentityPaint.racialName(abilityId: string): string
 	return abilityId
 end
 
-function IdentityPaint.itemIdentityHint(preferredArchetype: string?, homelandZoneId: string?): string
+function IdentityPaint.itemIdentityHint(preferredClass: string?, homelandZoneId: string?): string
 	local bits: { string } = {}
-	if preferredArchetype ~= nil and preferredArchetype ~= "" then
-		table.insert(bits, `Preferred  {IdentityPaint.presentationName(preferredArchetype, "Archetype")}`)
+	if preferredClass ~= nil and preferredClass ~= "" then
+		table.insert(bits, `Preferred  {IdentityPaint.presentationName(preferredClass, "Class")}`)
 	end
 	if homelandZoneId ~= nil and homelandZoneId ~= "" then
 		table.insert(bits, `Homeland  {homelandZoneId}`)
@@ -90,11 +90,11 @@ function IdentityPaint.itemIdentityHint(preferredArchetype: string?, homelandZon
 	return "\n" .. table.concat(bits, "\n")
 end
 
-function IdentityPaint.identityLine(raceId: string, originId: string, archetypeId: string, specId: string): string
+function IdentityPaint.identityLine(raceId: string, originId: string, classId: string, specId: string): string
 	local parts: { string } = {}
 	local raceName = IdentityPaint.presentationName(raceId, "Race")
 	local originName = IdentityPaint.presentationName(originId, "Origin")
-	local archName = IdentityPaint.presentationName(archetypeId, "Archetype")
+	local archName = IdentityPaint.presentationName(classId, "Class")
 	local specName = IdentityPaint.specName(specId)
 	if raceName ~= "" then
 		table.insert(parts, raceName)
@@ -111,8 +111,8 @@ function IdentityPaint.identityLine(raceId: string, originId: string, archetypeI
 	return table.concat(parts, " · ")
 end
 
-function IdentityPaint.identityBlurb(archetypeId: string): string
-	local row = IdentityPresentationCatalog.get(archetypeId, "Archetype")
+function IdentityPaint.identityBlurb(classId: string): string
+	local row = IdentityPresentationCatalog.get(classId, "Class")
 	if row ~= nil then
 		return row.Blurb
 	end
