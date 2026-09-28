@@ -141,9 +141,9 @@ local loaders: { [ContentKind]: () -> KindCache } = {
 		end
 		return cacheSet(ids)
 	end,
-	Archetype = function()
-		local ArchetypeCatalog = require(ReplicatedStorage.Definitions.Characters.ArchetypeCatalog)
-		return cacheSet(setFromKeyedMap(ArchetypeCatalog.all()))
+	Class = function()
+		local ClassCatalog = require(ReplicatedStorage.Definitions.Characters.ClassCatalog)
+		return cacheSet(setFromKeyedMap(ClassCatalog.all()))
 	end,
 	Specialization = function()
 		local SpecializationCatalog = require(ReplicatedStorage.Definitions.Characters.SpecializationCatalog)
