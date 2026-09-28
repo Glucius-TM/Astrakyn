@@ -7,98 +7,84 @@ local StatCatalog = require(ReplicatedStorage.Definitions.Combat.Stats.StatCatal
 local StatTypes = require(ReplicatedStorage.Shared.Types.StatTypes)
 
 type StatModifier = StatTypes.StatModifier
-type ModifierOp = StatTypes.ModifierOp
 
 export type RaceDefinition = {
 	Id: string,
 	Name: string,
-	StatId: string,
-	Op: ModifierOp,
-	Value: number,
-	Priority: number,
-	RacialAbilityId: string,
+	AzerothCoreRaceId: number,
+	FactionId: string,
 	CanonicalOriginId: string,
+	RacialAbilityId: string,
+	AllowedClassIds: { string },
+	BaseStatOffsets: { [string]: number },
 }
 
 local RACE_MOD_PRIORITY = 11
 
-local function race(
-	id: string,
-	name: string,
-	statId: string,
-	op: ModifierOp,
-	value: number,
-	racialAbilityId: string,
-	canonicalOriginId: string
-): RaceDefinition
-	if StatCatalog.get(statId) == nil then
-		error(`RaceCatalog unknown StatId {statId}`)
-	end
-	if OriginCatalog.get(canonicalOriginId) == nil then
-		error(`RaceCatalog unknown CanonicalOriginId {canonicalOriginId}`)
-	end
-	if racialAbilityId == "" then
-		error(`RaceCatalog empty RacialAbilityId for {id}`)
+local function race(id: string, name: string, referenceId: number, factionId: string, originId: string, racialAbilityId: string, allowedClassIds: { string }, baseStatOffsets: { [string]: number }): RaceDefinition
+	if OriginCatalog.get(originId) == nil then
+		error(`RaceCatalog unknown CanonicalOriginId {originId}`)
 	end
 	if AbilityCatalog.get(racialAbilityId) == nil then
 		error(`RaceCatalog unknown RacialAbilityId {racialAbilityId}`)
 	end
+	for statId in baseStatOffsets do
+		if StatCatalog.get(statId) == nil then
+			error(`RaceCatalog unknown stat {statId}`)
+		end
+	end
 	return {
-		Id = id,
-		Name = name,
-		StatId = statId,
-		Op = op,
-		Value = value,
-		Priority = RACE_MOD_PRIORITY,
-		RacialAbilityId = racialAbilityId,
-		CanonicalOriginId = canonicalOriginId,
+		Id = id, Name = name, AzerothCoreRaceId = referenceId, FactionId = factionId,
+		CanonicalOriginId = originId, RacialAbilityId = racialAbilityId,
+		AllowedClassIds = allowedClassIds, BaseStatOffsets = baseStatOffsets,
 	}
 end
 
 local races: { RaceDefinition } = {
-	race("Astralborn", "Astralborn", "Versatility", "Add", 0.02, "AstralStep", "Threshold"),
-	race("Stonekin", "Stonekin", "Stamina", "Add", 3, "Stonehide", "Kynfall"),
-	race("Emberkin", "Emberkin", "Strength", "Add", 2, "EmberBlood", "Emberwatch"),
-	race("Paleward", "Paleward", "Agility", "Add", 2, "PaleEvade", "Palehaven"),
-	race("Voidtouched", "Voidtouched", "Intellect", "Add", 2, "VoidTouch", "Voidmarch"),
-	race("Tideborn", "Tideborn", "Spirit", "Add", 2, "TideSurge", "Tidehaven"),
-	race("Thornen", "Thornen", "Expertise", "Add", 0.03, "ThornSkin", "Thornwood"),
-	race("Skylorn", "Skylorn", "HasteRating", "Add", 150, "SkyDash", "Skyreach"),
+	race("Astralborn", "Astralborn", 1, "Concord", "Threshold", "AstralStep", { "Vanguard", "Templar", "Stalker", "Luminary", "Dragoon", "Weaver", "Hexwright" }, { Spirit = 1 }),
+	race("Emberkin", "Emberkin", 2, "Pact", "Emberwatch", "EmberBlood", { "Vanguard", "Sentinel", "Stalker", "Dragoon", "Tempest", "Hexwright" }, { Strength = 2, Intellect = -1 }),
+	race("Stonekin", "Stonekin", 3, "Concord", "Kynfall", "Stonehide", { "Vanguard", "Templar", "Sentinel", "Stalker", "Luminary", "Dragoon" }, { Stamina = 2, Agility = -1 }),
+	race("Paleward", "Paleward", 4, "Concord", "Palehaven", "PaleEvade", { "Vanguard", "Sentinel", "Stalker", "Luminary", "Dragoon", "Warden" }, { Agility = 2, Strength = -1 }),
+	race("Voidtouched", "Voidtouched", 5, "Pact", "Voidmarch", "VoidTouch", { "Vanguard", "Stalker", "Luminary", "Dragoon", "Weaver", "Hexwright" }, { Spirit = 1, Stamina = -1 }),
+	race("Thornen", "Thornen", 6, "Pact", "Thornwood", "ThornSkin", { "Vanguard", "Sentinel", "Dragoon", "Tempest", "Warden" }, { Stamina = 2, Agility = -1 }),
+	race("Sparkkin", "Sparkkin", 7, "Concord", "Kynfall", "AstralStep", { "Vanguard", "Stalker", "Dragoon", "Weaver", "Hexwright" }, { Intellect = 2, Strength = -1 }),
+	race("Tideborn", "Tideborn", 8, "Pact", "Tidehaven", "TideSurge", { "Vanguard", "Sentinel", "Stalker", "Luminary", "Dragoon", "Tempest", "Weaver" }, { Agility = 1, Spirit = 1 }),
+	race("Skylorn", "Skylorn", 10, "Pact", "Skyreach", "SkyDash", { "Templar", "Sentinel", "Stalker", "Luminary", "Dragoon", "Weaver", "Hexwright" }, { Intellect = 1, Agility = 1 }),
+	race("Starforged", "Starforged", 11, "Concord", "Skyreach", "Stonehide", { "Vanguard", "Templar", "Sentinel", "Luminary", "Dragoon", "Tempest", "Weaver" }, { Strength = 1, Intellect = 1 }),
 }
 
 local byId: { [string]: RaceDefinition } = {}
+local byReference: { [number]: RaceDefinition } = {}
 for _, row in races do
-	if byId[row.Id] ~= nil then
-		error(`duplicate race id {row.Id}`)
-	end
+	if byId[row.Id] ~= nil then error(`duplicate race id {row.Id}`) end
+	if byReference[row.AzerothCoreRaceId] ~= nil then error(`duplicate AzerothCoreRaceId {row.AzerothCoreRaceId}`) end
 	byId[row.Id] = row
+	byReference[row.AzerothCoreRaceId] = row
 end
-
-local DEFAULT_RACE_ID = "Astralborn"
 
 local RaceCatalog = {}
 
-function RaceCatalog.defaultId(): string
-	return DEFAULT_RACE_ID
+function RaceCatalog.defaultId(): string return "Astralborn" end
+function RaceCatalog.all(): { RaceDefinition } return races end
+function RaceCatalog.get(id: string): RaceDefinition? return byId[id] end
+function RaceCatalog.getByAzerothCoreId(id: number): RaceDefinition? return byReference[id] end
+
+function RaceCatalog.allowsClass(def: RaceDefinition, classId: string): boolean
+	for _, allowed in def.AllowedClassIds do
+		if allowed == classId then return true end
+	end
+	return false
 end
 
-function RaceCatalog.all(): { RaceDefinition }
-	return races
-end
-
-function RaceCatalog.get(id: string): RaceDefinition?
-	return byId[id]
-end
-
-function RaceCatalog.modifierFor(def: RaceDefinition): StatModifier
-	return {
-		StatId = def.StatId,
-		Source = "Race",
-		SourceId = def.Id,
-		Op = def.Op,
-		Value = def.Value,
-		Priority = def.Priority,
-	}
+function RaceCatalog.modifiersFor(def: RaceDefinition): { StatModifier }
+	local out: { StatModifier } = {}
+	for statId, value in def.BaseStatOffsets do
+		table.insert(out, {
+			StatId = statId, Source = "Race", SourceId = def.Id,
+			Op = "Add", Value = value, Priority = RACE_MOD_PRIORITY,
+		})
+	end
+	return out
 end
 
 return RaceCatalog
