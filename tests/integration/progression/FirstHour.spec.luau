@@ -4,7 +4,7 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local AbilityCatalog = require(ReplicatedStorage.Definitions.Abilities.AbilityCatalog)
-local ArchetypeCatalog = require(ReplicatedStorage.Definitions.Characters.ArchetypeCatalog)
+local ClassCatalog = require(ReplicatedStorage.Definitions.Characters.ClassCatalog)
 local FirstHourObjectives = require(ReplicatedStorage.Shared.Utility.FirstHourObjectives)
 local HarnessApi = require(script.Parent.Parent.Parent.HarnessApi)
 local PoiCatalog = require(ReplicatedStorage.Definitions.World.PoiCatalog)
@@ -84,7 +84,7 @@ function FirstHourObjectivesSpec.run(Harness: Harness)
 		Harness.assert(table.find(emberLines, `Accept {quest.Name}`) == nil, "Emberwatch skips capital quest")
 	end
 
-	for _, arch in ArchetypeCatalog.all() do
+	for _, arch in ClassCatalog.all() do
 		local archQuest = QuestCatalog.get(`Quest_Arch_{arch.Id}`)
 		Harness.assert(archQuest ~= nil, `{arch.Id} intro quest exists`)
 		if archQuest then
