@@ -4,7 +4,7 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local AbilityCatalog = require(ReplicatedStorage.Definitions.Abilities.AbilityCatalog)
-local ArchetypeCatalog = require(ReplicatedStorage.Definitions.Characters.ArchetypeCatalog)
+local ClassCatalog = require(ReplicatedStorage.Definitions.Characters.ClassCatalog)
 local ExtraPoolCatalog = require(ReplicatedStorage.Definitions.Combat.Stats.ExtraPoolCatalog)
 local HarnessApi = require(script.Parent.Parent.Parent.HarnessApi)
 local IdentityPresentationCatalog = require(ReplicatedStorage.Definitions.Characters.IdentityPresentationCatalog)
@@ -145,14 +145,14 @@ function IdentityCatalogIntegritySpec.run(Harness: Harness)
 	Harness.assertEqual(#OriginCatalog.all(), 8, "eight origins")
 	Harness.assertEqual(#IdentityPresentationCatalog.allRaces(), 8, "eight race presentations")
 	Harness.assertEqual(#IdentityPresentationCatalog.allOrigins(), 8, "eight origin presentations")
-	Harness.assertEqual(#IdentityPresentationCatalog.allArchetypes(), 12, "twelve archetype presentations")
+	Harness.assertEqual(#IdentityPresentationCatalog.allClasses(), 12, "twelve class presentations")
 	Harness.assertEqual(#SpecializationCatalog.all(), 24, "twenty-four specializations")
 
 	local archCount = 0
-	for _ in ArchetypeCatalog.all() do
+	for _ in ClassCatalog.all() do
 		archCount += 1
 	end
-	Harness.assertEqual(archCount, 12, "twelve archetypes")
+	Harness.assertEqual(archCount, 12, "twelve classes")
 
 	local homelands = 0
 	for _, zone in ZoneCatalog.all() do
@@ -189,8 +189,8 @@ function IdentityCatalogIntegritySpec.run(Harness: Harness)
 			Harness.assert(originPres.Lore ~= "", `{origin.Id} lore`)
 		end
 	end
-	for _, archDef in ArchetypeCatalog.all() do
-		local archPres = IdentityPresentationCatalog.get(archDef.Id, "Archetype")
+	for _, archDef in ClassCatalog.all() do
+		local archPres = IdentityPresentationCatalog.get(archDef.Id, "Class")
 		Harness.assert(archPres ~= nil, `{archDef.Id} presentation`)
 		if archPres ~= nil then
 			Harness.assert(archPres.Lore ~= "", `{archDef.Id} lore`)
@@ -204,17 +204,17 @@ function IdentityCatalogIntegritySpec.run(Harness: Harness)
 		end
 	end
 
-	local warden = ArchetypeCatalog.get("Warden")
+	local warden = ClassCatalog.get("Warden")
 	Harness.assert(
 		warden ~= nil and warden.Role == "Tank" and warden.SignatureAbilityId == "Taunt",
 		"Warden Role/signature"
 	)
-	local weaver = ArchetypeCatalog.get("Weaver")
+	local weaver = ClassCatalog.get("Weaver")
 	Harness.assert(
 		weaver ~= nil and weaver.Role == "Caster" and weaver.SignatureAbilityId == "Rift",
 		"Weaver Role/signature"
 	)
-	local stalker = ArchetypeCatalog.get("Stalker")
+	local stalker = ClassCatalog.get("Stalker")
 	Harness.assert(
 		stalker ~= nil and stalker.Role == "MeleeDps" and stalker.SignatureAbilityId == "Ambush",
 		"Stalker Role/signature"
@@ -231,8 +231,8 @@ function IdentityCatalogIntegritySpec.run(Harness: Harness)
 		table.insert(kits, row)
 	end
 	for _, row in kits do
-		local arch = ArchetypeCatalog.get(row.Id)
-		Harness.assert(arch ~= nil, `{row.Id} archetype`)
+		local arch = ClassCatalog.get(row.Id)
+		Harness.assert(arch ~= nil, `{row.Id} class`)
 		if arch ~= nil then
 			Harness.assert(arch.Role == row.Role, `{row.Id} Role`)
 			Harness.assert(arch.ResourceBias == row.Bias, `{row.Id} ResourceBias`)
@@ -244,7 +244,7 @@ function IdentityCatalogIntegritySpec.run(Harness: Harness)
 			Harness.assert(hasId(arch.Abilities, row.Form), `{row.Id} transform in kit`)
 			local kitSize = #arch.Abilities
 			Harness.assert(kitSize >= 14 and kitSize <= 18, `{row.Id} kit size 14-18`)
-			Harness.assert(IdentityPresentationCatalog.get(row.Id, "Archetype") ~= nil, `{row.Id} presentation`)
+			Harness.assert(IdentityPresentationCatalog.get(row.Id, "Class") ~= nil, `{row.Id} presentation`)
 			Harness.assert(TransformationCatalog.get(row.Form) ~= nil, `{row.Form} transform row`)
 			local formAbility = AbilityCatalog.get(row.Form)
 			Harness.assert(formAbility ~= nil and formAbility.Type == "Transformation", `{row.Form} ability`)
@@ -269,7 +269,7 @@ function IdentityCatalogIntegritySpec.run(Harness: Harness)
 			end
 			for _, specId in row.Specs do
 				local spec = SpecializationCatalog.get(specId)
-				Harness.assert(spec ~= nil and spec.ArchetypeId == row.Id, `{specId} spec`)
+				Harness.assert(spec ~= nil and spec.ClassId == row.Id, `{specId} spec`)
 				if spec ~= nil then
 					local granted = grantAbilities(arch.Abilities, arch.SignatureAbilityId, spec.ExtraAbilities)
 					Harness.assert(hasId(granted, "Pulse"), `{specId} Create Pulse`)
@@ -330,7 +330,7 @@ function IdentityCatalogIntegritySpec.run(Harness: Harness)
 	end
 
 	local referenced: { [string]: boolean } = {}
-	for _, archDef in ArchetypeCatalog.all() do
+	for _, archDef in ClassCatalog.all() do
 		for _, abilityId in archDef.Abilities do
 			referenced[abilityId] = true
 		end
