@@ -6,7 +6,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local AbilityCatalog = require(ReplicatedStorage.Definitions.Abilities.AbilityCatalog)
 local AchievementCatalog = require(ReplicatedStorage.Definitions.Characters.AchievementCatalog)
-local ArchetypeCatalog = require(ReplicatedStorage.Definitions.Characters.ArchetypeCatalog)
+local ClassCatalog = require(ReplicatedStorage.Definitions.Characters.ClassCatalog)
 local CosmeticCatalog = require(ReplicatedStorage.Definitions.Characters.CosmeticCatalog)
 local ExtraPoolCatalog = require(ReplicatedStorage.Definitions.Combat.Stats.ExtraPoolCatalog)
 local GameConstants = require(ReplicatedStorage.Shared.Constants.GameConstants)
@@ -27,9 +27,9 @@ type Harness = HarnessApi.Harness
 
 type SpecializationDefinition = SpecializationCatalog.SpecializationDefinition
 
-local function firstSpec(archetypeId: string): SpecializationDefinition?
+local function firstSpec(classId: string): SpecializationDefinition?
 	for _, spec in SpecializationCatalog.all() do
-		if spec.ArchetypeId == archetypeId then
+		if spec.ClassId == classId then
 			return spec
 		end
 	end
@@ -72,7 +72,7 @@ function IdentityIntegrationSpec.run(Harness: Harness)
 	Harness.assert(SetBonusCatalog.get("Sky") ~= nil, "Sky set")
 	Harness.assert(ItemCatalog.get("SentinelBow") ~= nil, "SentinelBow")
 	local bow = ItemCatalog.get("SentinelBow")
-	Harness.assert(bow ~= nil and bow.PreferredArchetype == "Sentinel", "SentinelBow preferred")
+	Harness.assert(bow ~= nil and bow.PreferredClass == "Sentinel", "SentinelBow preferred")
 	local emberMail = ItemCatalog.get("EmberMail")
 	Harness.assert(emberMail ~= nil and emberMail.HomelandZoneId == "Zone_Ember", "EmberMail homeland")
 	Harness.assert(#VendorCatalog.forZone("Zone_Ember") >= 4, "Ember vendor stock")
@@ -98,7 +98,7 @@ function IdentityIntegrationSpec.run(Harness: Harness)
 		end
 	end
 
-	for _, arch in ArchetypeCatalog.all() do
+	for _, arch in ClassCatalog.all() do
 		local spec = firstSpec(arch.Id)
 		Harness.assert(spec ~= nil, `{arch.Id} spec`)
 		local loadout = StartingLoadoutCatalog.get(arch.Id)
