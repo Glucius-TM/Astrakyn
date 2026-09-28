@@ -99,27 +99,27 @@ function ProfileValidatorSpec.run(Harness: Harness)
 
 	local createdOk = ProfileFactory.empty(36, "CreatedOk")
 	createdOk.Character.Created = true
-	createdOk.Character.ArchetypeId = "Warden"
+	createdOk.Character.ClassId = "Warden"
 	createdOk.Character.SpecializationId = "Aegis"
 	local createdResult = ProfileValidator.validate(createdOk)
 	Harness.assert(createdResult.Ok == true, "created Warden Aegis validates")
 
 	local mismatch = ProfileFactory.empty(37, "SpecMismatch")
 	mismatch.Character.Created = true
-	mismatch.Character.ArchetypeId = "Warden"
+	mismatch.Character.ClassId = "Warden"
 	mismatch.Character.SpecializationId = "SpecRift"
 	local mismatchResult = ProfileValidator.validate(mismatch)
-	Harness.assert(mismatchResult.Ok == false, "spec outside archetype rejected")
+	Harness.assert(mismatchResult.Ok == false, "spec outside class rejected")
 	if mismatchResult.Ok == false then
-		Harness.assertEqual(mismatchResult.Error, "spec archetype mismatch", "spec mismatch names the door")
+		Harness.assertEqual(mismatchResult.Error, "spec class mismatch", "spec mismatch names the door")
 	end
 
 	local unknownArch = ProfileFactory.empty(38, "UnknownArch")
 	unknownArch.Character.Created = true
-	unknownArch.Character.ArchetypeId = "NotAClass"
+	unknownArch.Character.ClassId = "NotAClass"
 	unknownArch.Character.SpecializationId = "Aegis"
 	local archResult = ProfileValidator.validate(unknownArch)
-	Harness.assert(archResult.Ok == false, "unknown ArchetypeId rejected")
+	Harness.assert(archResult.Ok == false, "unknown ClassId rejected")
 end
 
 return ProfileValidatorSpec
