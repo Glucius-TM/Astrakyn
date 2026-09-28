@@ -40,7 +40,7 @@ function BuildResolver.fromProfile(profile: PlayerProfile, inventory: { ItemSave
 	end
 
 	return {
-		ArchetypeId = profile.Character.ArchetypeId,
+		ClassId = profile.Character.ClassId,
 		SpecializationId = profile.Character.SpecializationId,
 		RaceId = profile.Character.RaceId,
 		OriginId = profile.Character.OriginId,
