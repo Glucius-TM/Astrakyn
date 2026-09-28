@@ -1,19 +1,19 @@
 --!strict
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ArchetypeCatalog = require(ReplicatedStorage.Definitions.Characters.ArchetypeCatalog)
+local ClassCatalog = require(ReplicatedStorage.Definitions.Characters.ClassCatalog)
 local MacroCatalog = require(ReplicatedStorage.Definitions.Combat.Macros.MacroCatalog)
 
-export type StartingMacro = { ArchetypeId: string, MacroId: string }
+export type StartingMacro = { ClassId: string, MacroId: string }
 
-local function seed(archetypeId: string, macroId: string): StartingMacro
-	if ArchetypeCatalog.get(archetypeId) == nil then
-		error(`StartingMacroCatalog unknown ArchetypeId {archetypeId}`)
+local function seed(classId: string, macroId: string): StartingMacro
+	if ClassCatalog.get(classId) == nil then
+		error(`StartingMacroCatalog unknown ClassId {classId}`)
 	end
 	if MacroCatalog.get(macroId) == nil then
 		error(`StartingMacroCatalog unknown MacroId {macroId}`)
 	end
-	return { ArchetypeId = archetypeId, MacroId = macroId }
+	return { ClassId = classId, MacroId = macroId }
 end
 
 local rows: { StartingMacro } = {
@@ -33,16 +33,16 @@ local rows: { StartingMacro } = {
 
 local byId: { [string]: StartingMacro } = {}
 for _, row in rows do
-	if byId[row.ArchetypeId] ~= nil then
-		error(`duplicate starting macro {row.ArchetypeId}`)
+	if byId[row.ClassId] ~= nil then
+		error(`duplicate starting macro {row.ClassId}`)
 	end
-	byId[row.ArchetypeId] = row
+	byId[row.ClassId] = row
 end
 
 local StartingMacroCatalog = {}
 
-function StartingMacroCatalog.get(archetypeId: string): StartingMacro?
-	return byId[archetypeId]
+function StartingMacroCatalog.get(classId: string): StartingMacro?
+	return byId[classId]
 end
 
 function StartingMacroCatalog.count(): number
